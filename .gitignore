@@ -1,3 +1,6 @@
+<<<<<<< HEAD
+.idea/
+=======
 # Gradle
 .gradle/
 **/build/
@@ -16,3 +19,4 @@ gradle-app.setting
 Thumbs.db
 *.log
 
+>>>>>>> 67922a434e91ba60c3977f4b77e4242e20743330
