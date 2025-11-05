@@ -1,0 +1,116 @@
+package com.hubEleven.company.application.service;
+
+import static com.hubEleven.common.code.ErrorCode.COMPANY_DUPLICATED;
+
+import com.hubEleven.common.code.ErrorCode;
+import com.hubEleven.common.exception.GlobalException;
+import com.hubEleven.common.request.CommonPageRequest;
+import com.hubEleven.common.response.CommonPageResponse;
+import com.hubEleven.common.utils.PagingUtils;
+import com.hubEleven.company.application.dto.CompanyDTO;
+import com.hubEleven.company.domain.model.Company;
+import com.hubEleven.company.domain.model.CompanyStatus;
+import com.hubEleven.company.domain.model.CompanyType;
+import com.hubEleven.company.domain.repository.CompanyRepository;
+import com.hubEleven.company.domain.repository.CompanySearchCondition;
+import com.hubEleven.company.presentation.request.CompanyRequests;
+import java.util.Optional;
+import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+public class CompanyAppService {
+
+	private final CompanyRepository companyRepository;
+
+	@Transactional
+	public CompanyDTO createCompany(CompanyRequests.Create req) {
+		if (companyRepository.existsByHubIdAndName(req.hubId(), req.name())) {
+			throw new GlobalException(COMPANY_DUPLICATED);
+		}
+		Company company =
+				Company.create(req.hubId(), req.name(), req.type(), req.slackId(), req.address());
+		return CompanyDTO.from(companyRepository.save(company));
+	}
+
+	@Transactional
+	public CompanyDTO updateCompany(UUID companyId, CompanyRequests.Update req) {
+		var company =
+				companyRepository
+						.findById(companyId)
+						.orElseThrow(() -> new GlobalException(ErrorCode.COMPANY_NOT_FOUND));
+
+		if (req.name() != null && !req.name().isBlank()) {
+			boolean nameChanged = !req.name().equalsIgnoreCase(company.getName());
+			if (nameChanged && companyRepository.existsByHubIdAndName(company.getHubId(), req.name())) {
+				throw new GlobalException(ErrorCode.COMPANY_DUPLICATED);
+			}
+		}
+
+		company.changeType(req.type());
+		company.update(req.name(), req.address(), req.slackId());
+		return CompanyDTO.from(company);
+	}
+
+	@Transactional(readOnly = true)
+	public CompanyDTO getCompany(UUID companyId) {
+		var company =
+				companyRepository
+						.findById(companyId)
+						.orElseThrow(() -> new GlobalException(ErrorCode.COMPANY_NOT_FOUND));
+		return CompanyDTO.from(company);
+	}
+
+	@Transactional(readOnly = true)
+	public CommonPageResponse<CompanyDTO> findCompanyList(CommonPageRequest pageReq) {
+		Pageable pageable = pageReq.toPageable();
+		var cond = new CompanySearchCondition(null, null, null, null);
+		var page = companyRepository.search(cond, pageable);
+		return PagingUtils.convert(page, CompanyDTO::from);
+	}
+
+	@Transactional(readOnly = true)
+	public CommonPageResponse<CompanyDTO> searchCompany(
+			Optional<UUID> hubId,
+			Optional<String> name,
+			Optional<CompanyType> type,
+			Optional<CompanyStatus> status,
+			CommonPageRequest pageReq) {
+		Pageable pageable = pageReq.toPageable();
+		var cond =
+				new CompanySearchCondition(
+						hubId.orElse(null), name.orElse(null), type.orElse(null), status.orElse(null));
+		var page = companyRepository.search(cond, pageable);
+		return PagingUtils.convert(page, CompanyDTO::from);
+	}
+
+	@Transactional
+	public CompanyDTO changeStatus(UUID companyId, String rawStatus) {
+		var company =
+				companyRepository
+						.findById(companyId)
+						.orElseThrow(() -> new GlobalException(ErrorCode.COMPANY_NOT_FOUND));
+
+		CompanyStatus newStatus;
+		try {
+			newStatus = CompanyStatus.valueOf(rawStatus.toUpperCase());
+		} catch (IllegalArgumentException e) {
+			throw new GlobalException(ErrorCode.VALIDATION_ERROR);
+		}
+		company.changeStatus(newStatus);
+		return CompanyDTO.from(company);
+	}
+
+	@Transactional
+	public void deleteCompany(UUID companyId, Long deleterId) {
+		var company =
+				companyRepository
+						.findById(companyId)
+						.orElseThrow(() -> new GlobalException(ErrorCode.COMPANY_NOT_FOUND));
+		company.delete(deleterId);
+	}
+}
