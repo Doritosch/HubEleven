@@ -1,0 +1,29 @@
+package com.hubEleven.deliveryRoute.application;
+
+import com.hubEleven.delivery.application.dto.HubRouteResponseDto;
+import com.hubEleven.delivery.domain.Delivery;
+import com.hubEleven.delivery.domain.DeliveryStatus;
+import com.hubEleven.deliveryRoute.domain.DeliveryRoute;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+@NoArgsConstructor
+public class DeliveryRouteService {
+
+    // 배달 경로 생성
+    public void createDeliveryRoute (Delivery delivery, HubRouteResponseDto routeDto, int seq){
+        DeliveryRoute deliveryRoute = DeliveryRoute.builder()
+                .delivery(delivery)
+                .seq(seq)
+                .fromHubId(routeDto.fromHubId())
+                .toHubId(routeDto.toHubId())
+                .deliveryManagerId(delivery.getDeliveryManagerId())
+                .status(DeliveryStatus.HUB_WAITHING)
+                .expectedDistance(routeDto.distance())
+                .expectedDuration(routeDto.duration())
+                .build();
+    }
+}
