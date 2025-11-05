@@ -2,7 +2,9 @@ package com.hubEleven.company;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 
+@EnableFeignClients(basePackages = "com.hubEleven.company.infrastructure.client")
 @SpringBootApplication
 public class CompanyApplication {
 
