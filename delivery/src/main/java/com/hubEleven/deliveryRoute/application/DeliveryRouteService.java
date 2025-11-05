@@ -4,13 +4,11 @@ import com.hubEleven.delivery.application.dto.HubRouteResponseDto;
 import com.hubEleven.delivery.domain.Delivery;
 import com.hubEleven.delivery.domain.DeliveryStatus;
 import com.hubEleven.deliveryRoute.domain.DeliveryRoute;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-@NoArgsConstructor
 public class DeliveryRouteService {
 
     // 배달 경로 생성
