@@ -15,33 +15,33 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class DeliveryManager {
 
-    @Id
-    private Long deliveryManagerId; //userId를 받아올 것임
+	@Id private Long deliveryManagerId; // userId를 받아올 것임
 
-    private UUID hubId;
+	private UUID hubId;
 
-    private String slackId;
+	private String slackId;
 
-    @Enumerated(EnumType.STRING)
-    private DeliveryType deliveryType;
+	@Enumerated(EnumType.STRING)
+	private DeliveryType deliveryType;
 
-    @Column(updatable = false, nullable = false)
-    private int deliveryOrder;
+	@Column(updatable = false, nullable = false)
+	private int deliveryOrder;
 
-    private  DeliveryManager(Long deliveryManagerId, UUID hubId, String slackId,
-        DeliveryType deliveryType, int deliveryOrder) {
-        this.deliveryManagerId = deliveryManagerId;
-        this.hubId = hubId;
-        this.slackId = slackId;
-        this.deliveryType = deliveryType;
-        this.deliveryOrder = deliveryOrder;
-    }
+	private DeliveryManager(
+			Long deliveryManagerId,
+			UUID hubId,
+			String slackId,
+			DeliveryType deliveryType,
+			int deliveryOrder) {
+		this.deliveryManagerId = deliveryManagerId;
+		this.hubId = hubId;
+		this.slackId = slackId;
+		this.deliveryType = deliveryType;
+		this.deliveryOrder = deliveryOrder;
+	}
 
-    public static DeliveryManager create(
-            Long id, UUID hubId, String slackId, DeliveryType deliveryType, int deliveryOrder
-    ) {
-        return new DeliveryManager(id, hubId, slackId, deliveryType, deliveryOrder);
-
-    }
+	public static DeliveryManager create(
+			Long id, UUID hubId, String slackId, DeliveryType deliveryType, int deliveryOrder) {
+		return new DeliveryManager(id, hubId, slackId, deliveryType, deliveryOrder);
+	}
 }
-

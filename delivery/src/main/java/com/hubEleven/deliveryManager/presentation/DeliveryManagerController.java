@@ -1,6 +1,5 @@
 package com.hubEleven.deliveryManager.presentation;
 
-
 import com.hubEleven.deliveryManager.application.DeliveryManagerService;
 import com.hubEleven.deliveryManager.presentation.dto.request.DeliveryManagerCreateRequestDto;
 import com.hubEleven.deliveryManager.presentation.dto.response.DeliveryManagerResponseDto;
@@ -17,22 +16,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/v1/delivery-managers")
 public class DeliveryManagerController {
 
-    private final DeliveryManagerService deliveryManagerService;
+	private final DeliveryManagerService deliveryManagerService;
 
-    public DeliveryManagerController(DeliveryManagerService deliveryManagerService) {
-        this.deliveryManagerService = deliveryManagerService;
-    }
+	public DeliveryManagerController(DeliveryManagerService deliveryManagerService) {
+		this.deliveryManagerService = deliveryManagerService;
+	}
 
+	@PostMapping
+	public ResponseEntity<DeliveryManagerResponseDto> createDeliveryManager(
+			@RequestBody @Valid DeliveryManagerCreateRequestDto createRequestDto) {
+		// TODO: JWT토큰 파싱하여 권한 검증
+		log.info("[Controller] 배달 담당자 생성 요청");
+		DeliveryManagerResponseDto responseDto =
+				deliveryManagerService.createDeliveryManager(createRequestDto);
 
-    @PostMapping
-    public ResponseEntity<DeliveryManagerResponseDto> createDeliveryManager(
-            @RequestBody @Valid DeliveryManagerCreateRequestDto createRequestDto) {
-        //TODO: JWT토큰 파싱하여 권한 검증
-        log.info("[Controller] 배달 담당자 생성 요청");
-      DeliveryManagerResponseDto responseDto = deliveryManagerService.createDeliveryManager(createRequestDto);
-
-        return ResponseEntity.ok(responseDto);
-    }
-
-
+		return ResponseEntity.ok(responseDto);
+	}
 }
