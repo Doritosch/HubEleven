@@ -1,6 +1,6 @@
 package com.hubEleven.common.code;
 
-import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
