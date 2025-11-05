@@ -60,4 +60,28 @@ public class Company extends BaseEntity {
 		c.address = address;
 		return c;
 	}
+
+	public void update(String name, String address, String slackId) {
+		if (name != null && !name.isBlank()) {
+			this.name = name;
+		}
+		if (address != null && !address.isBlank()) {
+			this.address = address;
+		}
+		if (slackId != null && !slackId.isBlank()) {
+			this.slackId = slackId;
+		}
+	}
+
+	public void changeType(CompanyType type) {
+		if (type != null) {
+			this.companyType = type;
+		}
+	}
+
+	public void changeStatus(CompanyStatus status) {
+		if (status != null) {
+			this.status = status;
+		}
+	}
 }
