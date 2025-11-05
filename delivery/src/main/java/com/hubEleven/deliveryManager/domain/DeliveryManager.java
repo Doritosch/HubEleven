@@ -41,7 +41,11 @@ public class DeliveryManager {
 	}
 
 	public static DeliveryManager create(
-			Long id, UUID hubId, String slackId, DeliveryType deliveryType, int deliveryOrder) {
-		return new DeliveryManager(id, hubId, slackId, deliveryType, deliveryOrder);
+			Long deliveryManagerId,
+			UUID hubId,
+			String slackId,
+			DeliveryType deliveryType,
+			int deliveryOrder) {
+		return new DeliveryManager(deliveryManagerId, hubId, slackId, deliveryType, deliveryOrder);
 	}
 }

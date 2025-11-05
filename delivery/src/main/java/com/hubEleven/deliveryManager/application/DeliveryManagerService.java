@@ -5,6 +5,8 @@ import com.hubEleven.deliveryManager.domain.DeliveryManagerRepository;
 import com.hubEleven.deliveryManager.domain.DeliveryType;
 import com.hubEleven.deliveryManager.presentation.dto.request.DeliveryManagerCreateRequestDto;
 import com.hubEleven.deliveryManager.presentation.dto.response.DeliveryManagerResponseDto;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -40,7 +42,7 @@ public class DeliveryManagerService {
 		Long id = createRequestDto.deliveryManagerId();
 		UUID hubId = UUID.randomUUID();
 		String slackId = "slack001";
-		DeliveryType deliveryType = DeliveryType.COMPANY;
+		DeliveryType deliveryType = DeliveryType.HUB;
 		// ----------------------------------
 
 		// TODO: DB에 이미 존재하는 id 인지 확인
@@ -61,19 +63,33 @@ public class DeliveryManagerService {
 		return responseDto;
 	}
 
-	public int setDeliveryOrder(DeliveryType deliveryType) {
-		Integer maxOrder;
-		if (deliveryType == DeliveryType.HUB) {
-			maxOrder = deliveryManagerRepository.findMaxDeliveryOrderByDeliveryType(DeliveryType.HUB);
-			int nextOrder = maxOrder == null ? 1 : maxOrder + 1;
-			log.info("현재 마지막 순번 : {} , 생성된 배달 순번 : {}", maxOrder, nextOrder);
-			return nextOrder;
-		} else {
-			maxOrder = deliveryManagerRepository.findMaxDeliveryOrderByDeliveryType(DeliveryType.COMPANY);
-			int nextOrder = maxOrder == null ? 1 : maxOrder + 1;
-			log.info("현재 마지막 순번 : {} , 생성된 배달 순번 : {}", maxOrder, nextOrder);
+	@Transactional(readOnly = true)
+	public List<DeliveryManagerResponseDto> getAllDeliveryManager() {
+		/**
+		 * TODO: 검증사항 1. 조회 권한 검증(컨트롤러) 2. 세부 권한 검증(마스터는 전체조회 / 허브담당자는 본인허브 배달담당자만 조회 / 배달담당자는 본인만 조회)
+		 */
+		List<DeliveryManager> deliveryManager = deliveryManagerRepository.findAll();
+		return deliveryManager.stream().map(DeliveryManagerResponseDto::from).toList();
+	}
 
-			return nextOrder;
-		}
+	public DeliveryManagerResponseDto getDeliveryManager(Long managerId) {
+		/**
+		 * TODO: 검증사항 1. 조회 권한 검증(컨트롤러) 2. 세부 권한 검증(마스터는 모두 조회 가능 / 허브담당자는 본인허브 배달담당자만 조회 / 배달담당자는 본인만
+		 * 조회)
+		 */
+		Optional<DeliveryManager> deliveryManager = deliveryManagerRepository.findById(managerId);
+
+		return deliveryManager.map(DeliveryManagerResponseDto::from).orElse(null);
+	}
+
+	public int setDeliveryOrder(DeliveryType deliveryType) {
+
+		Integer maxOrder = deliveryManagerRepository.findMaxDeliveryOrderByDeliveryType(deliveryType);
+
+		int nextOrder = (maxOrder == null) ? 1 : maxOrder + 1;
+
+		log.info("배송 타입: {}, 현재 마지막 순번: {}, 생성된 순번: {}", deliveryType, maxOrder, nextOrder);
+
+		return nextOrder;
 	}
 }
