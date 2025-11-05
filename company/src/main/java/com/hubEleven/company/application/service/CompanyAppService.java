@@ -13,9 +13,12 @@ import com.hubEleven.company.domain.model.CompanyStatus;
 import com.hubEleven.company.domain.model.CompanyType;
 import com.hubEleven.company.domain.repository.CompanyRepository;
 import com.hubEleven.company.domain.repository.CompanySearchCondition;
+import com.hubEleven.company.infrastructure.client.HubClient;
 import com.hubEleven.company.presentation.request.CompanyRequests;
 import java.util.Optional;
 import java.util.UUID;
+
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -26,9 +29,19 @@ import org.springframework.transaction.annotation.Transactional;
 public class CompanyAppService {
 
 	private final CompanyRepository companyRepository;
+	private final HubClient hubClient;
+
+	private void assertHubExists(UUID hubId) {
+		try{
+			hubClient.getHub(hubId);
+		}catch (FeignException.NotFound e){
+			throw new GlobalException(ErrorCode.VALIDATION_ERROR);
+		}
+	}
 
 	@Transactional
 	public CompanyDTO createCompany(CompanyRequests.Create req) {
+		assertHubExists(req.hubId());
 		if (companyRepository.existsByHubIdAndName(req.hubId(), req.name())) {
 			throw new GlobalException(COMPANY_DUPLICATED);
 		}
@@ -44,13 +57,14 @@ public class CompanyAppService {
 						.findById(companyId)
 						.orElseThrow(() -> new GlobalException(ErrorCode.COMPANY_NOT_FOUND));
 
+		assertHubExists(company.getHubId());
+
 		if (req.name() != null && !req.name().isBlank()) {
-			boolean nameChanged = !req.name().equalsIgnoreCase(company.getName());
-			if (nameChanged && companyRepository.existsByHubIdAndName(company.getHubId(), req.name())) {
+			boolean changed = !req.name().equalsIgnoreCase(company.getName());
+			if (changed && companyRepository.existsByHubIdAndName(company.getHubId(), req.name())) {
 				throw new GlobalException(ErrorCode.COMPANY_DUPLICATED);
 			}
 		}
-
 		company.changeType(req.type());
 		company.update(req.name(), req.address(), req.slackId());
 		return CompanyDTO.from(company);
