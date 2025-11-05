@@ -3,9 +3,7 @@ package com.hubEleven.deliveryRoute.domain;
 import com.hubEleven.delivery.domain.Delivery;
 import com.hubEleven.delivery.domain.DeliveryStatus;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.UUID;
 
@@ -13,6 +11,8 @@ import java.util.UUID;
 @Setter
 @Getter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "p_delivery_route")
 public class DeliveryRoute {
     @Id

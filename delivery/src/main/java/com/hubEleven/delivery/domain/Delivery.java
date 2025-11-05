@@ -1,6 +1,5 @@
 package com.hubEleven.delivery.domain;
 
-import com.hubEleven.delivery.application.dto.HubRouteResponseDto;
 import com.hubEleven.deliveryRoute.domain.DeliveryRoute;
 import jakarta.persistence.*;
 import lombok.Getter;
