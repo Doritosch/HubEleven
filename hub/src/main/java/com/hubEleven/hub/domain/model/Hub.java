@@ -28,7 +28,7 @@ public class Hub {
 	@Column(name = "name", nullable = false, length = 100)
 	private String name;
 
-	@Embedded private Location location;	// address, latitude, longitude
+	@Embedded private Location location; // address, latitude, longitude
 
 	@Column(name = "region_code", nullable = false, length = 50)
 	private String regionCode;
