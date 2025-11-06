@@ -16,4 +16,7 @@ public interface DeliveryManagerRepository {
 	List<DeliveryManager> findAll();
 
 	List<DeliveryManager> findAllByHubId(UUID hubId);
+
+    Integer findMaxDeliveryOrderByHubId(UUID hubId);
+
 }

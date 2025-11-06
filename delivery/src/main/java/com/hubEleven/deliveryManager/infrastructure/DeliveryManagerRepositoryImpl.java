@@ -41,4 +41,11 @@ public class DeliveryManagerRepositoryImpl implements DeliveryManagerRepository 
 	public List<DeliveryManager> findAllByHubId(UUID hubId) {
 		return deliveryManagerJpaRepository.findByHubId(hubId);
 	}
+
+    @Override
+    public Integer findMaxDeliveryOrderByHubId(UUID hubId) {
+        return deliveryManagerJpaRepository.findMaxDeliveryOrderByHubId(hubId);
+    }
+
+
 }

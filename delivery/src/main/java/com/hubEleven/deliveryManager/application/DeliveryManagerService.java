@@ -40,16 +40,15 @@ public class DeliveryManagerService {
 		log.info("[Service] 배달 담당자 생성 요청");
 		// 임시 데이터----------------------------
 		Long id = createRequestDto.deliveryManagerId();
-		UUID hubId = UUID.randomUUID();
+		UUID hubId = UUID.fromString("9090dc79-9ed1-460b-a85f-521f0d8a28aa");//UUID.randomUUID();
 		String slackId = "slack001";
-		DeliveryType deliveryType = DeliveryType.HUB;
+		DeliveryType deliveryType = DeliveryType.COMPANY;
 		// ----------------------------------
 
 		// TODO: DB에 이미 존재하는 id 인지 확인
-		Integer maxOrder;
 
 		// 배송순번 부여
-		int deliveryOrder = setDeliveryOrder(deliveryType);
+		int deliveryOrder = setDeliveryOrder(deliveryType, hubId);
 
 		DeliveryManager deliveryManager =
 				DeliveryManager.create(id, hubId, slackId, deliveryType, deliveryOrder);
@@ -82,9 +81,14 @@ public class DeliveryManagerService {
 		return deliveryManager.map(DeliveryManagerResponseDto::from).orElse(null);
 	}
 
-	public int setDeliveryOrder(DeliveryType deliveryType) {
 
-		Integer maxOrder = deliveryManagerRepository.findMaxDeliveryOrderByDeliveryType(deliveryType);
+
+
+
+
+	public int setDeliveryOrder(DeliveryType deliveryType, UUID hubId) {
+
+        Integer maxOrder = deliveryManagerRepository.findMaxDeliveryOrderByHubId(hubId);
 
 		int nextOrder = (maxOrder == null) ? 1 : maxOrder + 1;
 
