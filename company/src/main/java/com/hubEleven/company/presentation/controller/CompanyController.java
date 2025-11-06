@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-// TODO @AuthenticationPrincipal
+// TODO @AuthenticationPrincipal 권한로직
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/companies")
