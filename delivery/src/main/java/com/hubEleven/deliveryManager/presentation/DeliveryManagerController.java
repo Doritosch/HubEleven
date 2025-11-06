@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -50,5 +51,11 @@ public class DeliveryManagerController {
 		log.info("[DeliveryManager Controller] 배달 담당자 단일 조회 요청");
 		DeliveryManagerResponseDto responseDto = deliveryManagerService.getDeliveryManager(managerId);
 		return ResponseEntity.ok(responseDto);
+	}
+
+	@DeleteMapping("/{managerId}")
+	public ResponseEntity<Void> deleteDeliveryManager(@PathVariable Long managerId) {
+		deliveryManagerService.deleteDeliveryManager(managerId);
+		return ResponseEntity.ok().build();
 	}
 }

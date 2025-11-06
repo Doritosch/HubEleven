@@ -40,7 +40,7 @@ public class DeliveryManagerService {
 		log.info("[Service] 배달 담당자 생성 요청");
 		// 임시 데이터----------------------------
 		Long id = createRequestDto.deliveryManagerId();
-		UUID hubId = UUID.fromString("9090dc79-9ed1-460b-a85f-521f0d8a28aa");//UUID.randomUUID();
+		UUID hubId = UUID.fromString("9090dc79-9ed1-460b-a85f-521f0d8a28aa"); // UUID.randomUUID();
 		String slackId = "slack001";
 		DeliveryType deliveryType = DeliveryType.COMPANY;
 		// ----------------------------------
@@ -81,19 +81,26 @@ public class DeliveryManagerService {
 		return deliveryManager.map(DeliveryManagerResponseDto::from).orElse(null);
 	}
 
-
-
-
-
-
 	public int setDeliveryOrder(DeliveryType deliveryType, UUID hubId) {
 
-        Integer maxOrder = deliveryManagerRepository.findMaxDeliveryOrderByHubId(hubId);
+		Integer maxOrder = deliveryManagerRepository.findMaxDeliveryOrderByHubId(hubId);
 
 		int nextOrder = (maxOrder == null) ? 1 : maxOrder + 1;
 
 		log.info("배송 타입: {}, 현재 마지막 순번: {}, 생성된 순번: {}", deliveryType, maxOrder, nextOrder);
 
 		return nextOrder;
+	}
+
+	public void deleteDeliveryManager(Long managerId) {
+		DeliveryManager deliveryManager =
+				deliveryManagerRepository
+						.findById(managerId)
+						.orElseThrow(() -> new IllegalArgumentException("해당 배송 담당자가 존재하지 않습니다."));
+
+		// 임시 데이터
+		Long deletedBy = 1L;
+		deliveryManager.softDelete(deletedBy);
+		deliveryManagerRepository.save(deliveryManager);
 	}
 }

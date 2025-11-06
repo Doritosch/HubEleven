@@ -16,12 +16,12 @@ public interface DeliveryManagerJpaRepository extends JpaRepository<DeliveryMana
 
 	List<DeliveryManager> findByHubId(UUID hubId);
 
-
-    @Query("""
-    SELECT MAX(dm.deliveryOrder)
-    FROM DeliveryManager dm
-    WHERE (:hubId IS NULL AND dm.hubId IS NULL)
-       OR (:hubId IS NOT NULL AND dm.hubId = :hubId)
+	@Query(
+			"""
+		SELECT MAX(dm.deliveryOrder)
+		FROM DeliveryManager dm
+		WHERE (:hubId IS NULL AND dm.hubId IS NULL)
+			OR (:hubId IS NOT NULL AND dm.hubId = :hubId)
 """)
-    Integer findMaxDeliveryOrderByHubId(@Param("hubId") UUID hubId);
+	Integer findMaxDeliveryOrderByHubId(@Param("hubId") UUID hubId);
 }
