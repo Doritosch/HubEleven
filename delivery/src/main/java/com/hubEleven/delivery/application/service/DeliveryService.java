@@ -1,16 +1,15 @@
 package com.hubEleven.delivery.application.service;
 
-import com.hubEleven.delivery.infrastructure.client.CompanyFeignClient;
-import com.hubEleven.delivery.infrastructure.client.HubRouteFeignClient;
-import com.hubEleven.delivery.infrastructure.client.OrderFeignClient;
 import com.hubEleven.delivery.application.dto.DeliveryRequestDto;
 import com.hubEleven.delivery.application.dto.DeliveryResponseDto;
-import com.hubEleven.delivery.infrastructure.dto.HubRouteFeignResponseDto;
-import com.hubEleven.delivery.infrastructure.dto.DeliveryMangerFeignResponseDto;
-import com.hubEleven.delivery.infrastructure.dto.OrderFeignResponseDto;
 import com.hubEleven.delivery.domain.Delivery;
 import com.hubEleven.delivery.domain.DeliveryRepository;
 import com.hubEleven.delivery.domain.DeliveryStatus;
+import com.hubEleven.delivery.infrastructure.client.CompanyFeignClient;
+import com.hubEleven.delivery.infrastructure.client.HubRouteFeignClient;
+import com.hubEleven.delivery.infrastructure.dto.DeliveryMangerFeignResponseDto;
+import com.hubEleven.delivery.infrastructure.dto.HubRouteFeignResponseDto;
+import com.hubEleven.delivery.infrastructure.dto.OrderFeignResponseDto;
 import com.hubEleven.delivery.infrastructure.dto.UserFeignResponseDto;
 import com.hubEleven.delivery.infrastructure.service.DeliveryManagerFeignService;
 import com.hubEleven.delivery.infrastructure.service.OrderFeignService;
@@ -35,7 +34,6 @@ import java.util.UUID;
 public class DeliveryService {
     private final DeliveryRepository deliveryRepository;
     private final CompanyFeignClient companyFeignClient;
-    private final OrderFeignClient orderFeignClient;
     private final HubRouteFeignClient hubRouteFeignClient;
     private final DeliveryRouteService deliveryRouteService;
     private final OrderFeignService orderFeignService;

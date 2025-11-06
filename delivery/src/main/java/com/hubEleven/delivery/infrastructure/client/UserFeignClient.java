@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.UUID;
 
-@FeignClient(name = "user")
+@FeignClient(name = "user-service")
 public interface UserFeignClient {
     @GetMapping("/v1/user")
     UserFeignResponseDto getUser(

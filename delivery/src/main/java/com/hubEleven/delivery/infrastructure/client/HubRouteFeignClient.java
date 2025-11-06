@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 import java.util.UUID;
 
-@FeignClient(name = "hubRoute")
+@FeignClient(name = "hub-service")
 public interface HubRouteFeignClient {
     @GetMapping("/v1/hubRoute")
     List<HubRouteFeignResponseDto> getRoute(@RequestParam UUID fromHubId, @RequestParam UUID toHubId);

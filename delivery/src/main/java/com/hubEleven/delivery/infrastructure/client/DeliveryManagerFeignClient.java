@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.UUID;
 
-@FeignClient(name = "delivery_Manager")
+@FeignClient(name = "delivery-service")
 public interface DeliveryManagerFeignClient {
     @GetMapping("/v1/deliveryManager")
     DeliveryMangerFeignResponseDto getDeliveryManager(

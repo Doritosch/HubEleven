@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.UUID;
 
-@FeignClient(name = "company")
+@FeignClient(name = "company-service")
 public interface CompanyFeignClient {
     @GetMapping("/v1/hub/{companyId}")
     CompanyFeignResponseDto getHubId(@PathVariable UUID companyId);

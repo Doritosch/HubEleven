@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.UUID;
 
-@FeignClient(name = "order")
+@FeignClient(name = "order-service")
 public interface OrderFeignClient {
     @GetMapping("/v1/order")
     OrderFeignResponseDto getOrder(@RequestParam UUID orderId);
