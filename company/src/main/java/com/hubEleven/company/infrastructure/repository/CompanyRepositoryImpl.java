@@ -58,8 +58,10 @@ public class CompanyRepositoryImpl implements CompanyRepository {
 		if (pageable.getSort().isSorted()) {
 			List<Order> orders = new ArrayList<>();
 			for (Sort.Order o : pageable.getSort()) {
-				orders.add(o.isAscending() ? cb.asc(root.get(o.getProperty()))
-						: cb.desc(root.get(o.getProperty())));
+				orders.add(
+						o.isAscending()
+								? cb.asc(root.get(o.getProperty()))
+								: cb.desc(root.get(o.getProperty())));
 			}
 			cq.orderBy(orders);
 		}
@@ -73,8 +75,7 @@ public class CompanyRepositoryImpl implements CompanyRepository {
 		Root<Company> countRoot = countQuery.from(Company.class);
 		List<Predicate> countPreds = buildPredicates(condition, cb, countRoot);
 		countPreds.add(cb.isNull(countRoot.get("deletedAt")));
-		countQuery.select(cb.count(countRoot))
-				.where(countPreds.toArray(Predicate[]::new));
+		countQuery.select(cb.count(countRoot)).where(countPreds.toArray(Predicate[]::new));
 		Long total = em.createQuery(countQuery).getSingleResult();
 
 		return new PageImpl<>(companies, pageable, total);

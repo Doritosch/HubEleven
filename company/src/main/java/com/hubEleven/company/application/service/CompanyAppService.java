@@ -15,12 +15,10 @@ import com.hubEleven.company.domain.repository.CompanyRepository;
 import com.hubEleven.company.domain.repository.CompanySearchCondition;
 import com.hubEleven.company.infrastructure.client.HubClient;
 import com.hubEleven.company.presentation.request.CompanyRequests;
+import feign.FeignException;
 import java.util.Optional;
 import java.util.UUID;
-
-import feign.FeignException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,13 +30,12 @@ public class CompanyAppService {
 	private final CompanyRepository companyRepository;
 	private final HubClient hubClient;
 
-
 	private void assertHubExists(UUID hubId) {
-		try{
+		try {
 			hubClient.getHub(hubId);
-		}catch (FeignException.NotFound e){
+		} catch (FeignException.NotFound e) {
 			throw new GlobalException(ErrorCode.VALIDATION_ERROR);
-		}catch (FeignException e){
+		} catch (FeignException e) {
 			throw new GlobalException(ErrorCode.SERVER_ERROR);
 		}
 	}
