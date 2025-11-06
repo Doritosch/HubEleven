@@ -52,13 +52,14 @@ public class CompanyRepositoryImpl implements CompanyRepository {
 		Root<Company> root = cq.from(Company.class);
 
 		List<Predicate> predicates = buildPredicates(condition, cb, root);
+		predicates.add(cb.isNull(root.get("deletedAt")));
 		cq.select(root).where(predicates.toArray(Predicate[]::new));
 
 		if (pageable.getSort().isSorted()) {
 			List<Order> orders = new ArrayList<>();
 			for (Sort.Order o : pageable.getSort()) {
-				Path<?> path = root.get(o.getProperty());
-				orders.add(o.isAscending() ? cb.asc(path) : cb.desc(path));
+				orders.add(o.isAscending() ? cb.asc(root.get(o.getProperty()))
+						: cb.desc(root.get(o.getProperty())));
 			}
 			cq.orderBy(orders);
 		}
@@ -70,9 +71,10 @@ public class CompanyRepositoryImpl implements CompanyRepository {
 
 		CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
 		Root<Company> countRoot = countQuery.from(Company.class);
-		countQuery
-				.select(cb.count(countRoot))
-				.where(buildPredicates(condition, cb, countRoot).toArray(Predicate[]::new));
+		List<Predicate> countPreds = buildPredicates(condition, cb, countRoot);
+		countPreds.add(cb.isNull(countRoot.get("deletedAt")));
+		countQuery.select(cb.count(countRoot))
+				.where(countPreds.toArray(Predicate[]::new));
 		Long total = em.createQuery(countQuery).getSingleResult();
 
 		return new PageImpl<>(companies, pageable, total);
@@ -80,6 +82,7 @@ public class CompanyRepositoryImpl implements CompanyRepository {
 
 	private static List<Predicate> buildPredicates(
 			CompanySearchCondition condition, CriteriaBuilder cb, Root<Company> root) {
+
 		List<Predicate> predicates = new ArrayList<>();
 
 		if (condition != null) {
@@ -88,10 +91,10 @@ public class CompanyRepositoryImpl implements CompanyRepository {
 			}
 			if (condition.companyName() != null && !condition.companyName().isBlank()) {
 				String like = "%" + condition.companyName().trim().toLowerCase() + "%";
-				predicates.add(cb.like(cb.lower(root.get("companyName")), like));
+				predicates.add(cb.like(cb.lower(root.get("name")), like));
 			}
 			if (condition.type() != null) {
-				predicates.add(cb.equal(root.get("type"), condition.type()));
+				predicates.add(cb.equal(root.get("companyType"), condition.type()));
 			}
 			if (condition.status() != null) {
 				predicates.add(cb.equal(root.get("status"), condition.status()));
