@@ -41,6 +41,8 @@ dependencies {
 
     //OpenFeign
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
+    implementation project(':common')
 }
 
 dependencyManagement {
