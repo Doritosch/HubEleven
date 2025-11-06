@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
+import static org.springframework.http.HttpStatus.*;
+
 @Getter
 @RequiredArgsConstructor
 public enum SuccessCode {
@@ -14,6 +16,6 @@ public enum SuccessCode {
 	UPDATED(HttpStatus.OK, "수정되었습니다."),
 	DELETED(HttpStatus.OK, "삭제되었습니다.");
 
-	private final HttpStatus status;
-	private final String message;
+    private final HttpStatus status;
+    private final String message;
 }
