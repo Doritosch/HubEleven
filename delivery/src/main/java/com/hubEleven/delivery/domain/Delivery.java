@@ -1,5 +1,7 @@
 package com.hubEleven.delivery.domain;
 
+import com.hubEleven.common.annotation.SoftDeletable;
+import com.hubEleven.common.model.BaseEntity;
 import com.hubEleven.deliveryRoute.domain.DeliveryRoute;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -11,12 +13,13 @@ import java.util.UUID;
 @Entity
 @Setter
 @Getter
+@SoftDeletable
 @Table(name = "p_delivery")
-public class Delivery {
+public class Delivery extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "delivery_id", nullable = false)
-    private UUID deliveryId;
+    private UUID id;
 
     @Column(name = "order_id", nullable = false)
     private UUID orderId;

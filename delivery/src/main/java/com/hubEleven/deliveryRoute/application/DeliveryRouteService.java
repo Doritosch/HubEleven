@@ -1,6 +1,6 @@
 package com.hubEleven.deliveryRoute.application;
 
-import com.hubEleven.delivery.application.dto.HubRouteResponseDto;
+import com.hubEleven.delivery.infrastructure.dto.HubRouteFeignResponseDto;
 import com.hubEleven.delivery.domain.Delivery;
 import com.hubEleven.delivery.domain.DeliveryStatus;
 import com.hubEleven.deliveryRoute.domain.DeliveryRoute;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 public class DeliveryRouteService {
 
     // 배달 경로 생성
-    public void createDeliveryRoute (Delivery delivery, HubRouteResponseDto routeDto, int seq){
+    public void createDeliveryRoute (Delivery delivery, HubRouteFeignResponseDto routeDto, int seq){
         DeliveryRoute deliveryRoute = DeliveryRoute.builder()
                 .delivery(delivery)
                 .seq(seq)

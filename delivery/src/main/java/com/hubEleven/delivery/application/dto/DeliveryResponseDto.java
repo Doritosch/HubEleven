@@ -15,9 +15,10 @@ public record DeliveryResponseDto(
         String recipientSlackId,
         Long deliveryManagerId
         ){
+    // Delivery 엔티티를 Dto로 변환하는 용도
     public static  DeliveryResponseDto from(Delivery delivery){
         return new DeliveryResponseDto(
-                delivery.getDeliveryId(),
+                delivery.getId(),
                 delivery.getOrderId(),
                 delivery.getStatus(),
                 delivery.getFromHubId(),

@@ -1,5 +1,7 @@
 package com.hubEleven.deliveryRoute.domain;
 
+import com.hubEleven.common.annotation.SoftDeletable;
+import com.hubEleven.common.model.BaseEntity;
 import com.hubEleven.delivery.domain.Delivery;
 import com.hubEleven.delivery.domain.DeliveryStatus;
 import jakarta.persistence.*;
@@ -13,8 +15,9 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@SoftDeletable
 @Table(name = "p_delivery_route")
-public class DeliveryRoute {
+public class DeliveryRoute extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "delivery_route_id", nullable = false)
