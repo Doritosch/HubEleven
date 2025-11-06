@@ -20,6 +20,7 @@ import java.util.UUID;
 
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,11 +32,14 @@ public class CompanyAppService {
 	private final CompanyRepository companyRepository;
 	private final HubClient hubClient;
 
+
 	private void assertHubExists(UUID hubId) {
 		try{
 			hubClient.getHub(hubId);
 		}catch (FeignException.NotFound e){
 			throw new GlobalException(ErrorCode.VALIDATION_ERROR);
+		}catch (FeignException e){
+			throw new GlobalException(ErrorCode.SERVER_ERROR);
 		}
 	}
 
