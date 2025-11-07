@@ -141,7 +141,6 @@ public class DeliveryService {
 		UUID toHubId = companyFeignClient.getHubId(toCompanyId).HubId();
 
 		// 허브 경로에 출발허브ID 와 도착허브ID를 넘기고 경로를 받는다.
-		// 목적지, 주문ID, 타입을 배송 담당자에게 보내기
 		List<HubRouteFeignResponseDto> hubRoute = hubRouteFeignClient.getRoute(fromHubId, toHubId);
 		for (int seq = 0; seq < hubRoute.size(); seq++) {
 			HubRouteFeignResponseDto deliveryRoute = hubRoute.get(seq);
