@@ -3,13 +3,11 @@ package com.hubEleven.deliveryManager.domain;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.domain.Pageable;
 
 public interface DeliveryManagerRepository {
 
-	// deliveryType에 따른 최대 순번값 조회
-	Integer findMaxDeliveryOrderByDeliveryType(DeliveryType type);
-
-	DeliveryManager save(DeliveryManager deliveryManager);
+    DeliveryManager save(DeliveryManager deliveryManager);
 
 	Optional<DeliveryManager> findById(Long id);
 
@@ -18,4 +16,12 @@ public interface DeliveryManagerRepository {
 	List<DeliveryManager> findAllByHubId(UUID hubId);
 
 	Integer findMaxDeliveryOrderByHubId(UUID hubId);
+
+	List<DeliveryManager> findNextAvailableManager(DeliveryType deliveryType, UUID hubId, Pageable pageable);
+
+    DeliveryManager saveAndFlush(DeliveryManager deliveryManager);
+    Integer findMaxDeliveryOrderByHubAndType(UUID hubId, DeliveryType type);
+    List<DeliveryManager> findTop10ByDeliveryTypeAndHubIdOrderByLastDeliveryTimeAsc(DeliveryType type, UUID hubId);
+    List<DeliveryManager> findTop10ByDeliveryTypeOrderByLastDeliveryTimeAsc(DeliveryType type);
+
 }

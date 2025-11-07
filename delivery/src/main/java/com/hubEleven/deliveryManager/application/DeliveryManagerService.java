@@ -3,7 +3,9 @@ package com.hubEleven.deliveryManager.application;
 import com.hubEleven.deliveryManager.domain.DeliveryManager;
 import com.hubEleven.deliveryManager.domain.DeliveryManagerRepository;
 import com.hubEleven.deliveryManager.domain.DeliveryType;
+import com.hubEleven.deliveryManager.presentation.dto.request.DeliveryManagerAssignRequestDto;
 import com.hubEleven.deliveryManager.presentation.dto.request.DeliveryManagerCreateRequestDto;
+import com.hubEleven.deliveryManager.presentation.dto.response.DeliveryManagerAssignResponseDto;
 import com.hubEleven.deliveryManager.presentation.dto.response.DeliveryManagerResponseDto;
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class DeliveryManagerService {
 
 	private final DeliveryManagerRepository deliveryManagerRepository;
+
+
 
 	public DeliveryManagerService(DeliveryManagerRepository deliveryManagerRepository) {
 		this.deliveryManagerRepository = deliveryManagerRepository;
@@ -40,9 +44,11 @@ public class DeliveryManagerService {
 		log.info("[Service] 배달 담당자 생성 요청");
 		// 임시 데이터----------------------------
 		Long id = createRequestDto.deliveryManagerId();
-		UUID hubId = UUID.fromString("9090dc79-9ed1-460b-a85f-521f0d8a28aa"); // UUID.randomUUID();
+		UUID hubId = null;//UUID.fromString("1524dc79-9ed1-460b-a85f-521f0d8a28aa"); //null; //UUID.fromString("9090dc79-9ed1-460b-a85f-521f0d8a28aa"); // UUID.randomUUID();
 		String slackId = "slack001";
-		DeliveryType deliveryType = DeliveryType.COMPANY;
+		DeliveryType deliveryType = DeliveryType.HUB;
+
+        log.info("배송타입 : {}", deliveryType);
 		// ----------------------------------
 
 		// TODO: DB에 이미 존재하는 id 인지 확인
@@ -53,7 +59,7 @@ public class DeliveryManagerService {
 		DeliveryManager deliveryManager =
 				DeliveryManager.create(id, hubId, slackId, deliveryType, deliveryOrder);
 
-		deliveryManagerRepository.save(deliveryManager);
+        deliveryManagerRepository.save(deliveryManager);
 
 		log.info("[Service] 배달 담당자 생성 - DB 저장 성공");
 
@@ -81,17 +87,6 @@ public class DeliveryManagerService {
 		return deliveryManager.map(DeliveryManagerResponseDto::from).orElse(null);
 	}
 
-	public int setDeliveryOrder(DeliveryType deliveryType, UUID hubId) {
-
-		Integer maxOrder = deliveryManagerRepository.findMaxDeliveryOrderByHubId(hubId);
-
-		int nextOrder = (maxOrder == null) ? 1 : maxOrder + 1;
-
-		log.info("배송 타입: {}, 현재 마지막 순번: {}, 생성된 순번: {}", deliveryType, maxOrder, nextOrder);
-
-		return nextOrder;
-	}
-
 	public void deleteDeliveryManager(Long managerId) {
 		DeliveryManager deliveryManager =
 				deliveryManagerRepository
@@ -103,4 +98,54 @@ public class DeliveryManagerService {
 		deliveryManager.softDelete(deletedBy);
 		deliveryManagerRepository.save(deliveryManager);
 	}
+
+
+
+    @Transactional
+    public DeliveryManagerAssignResponseDto assignDeliveryManagers(DeliveryManagerAssignRequestDto request) {
+
+        // 1️⃣ 허브 배송 담당자 배정 (허브 여러개)
+        List<DeliveryManager> hubDeliveryManagers = request.hubIds().stream()
+            .map(hubId -> assignHubDeliveryManager())
+            .toList();
+
+        // 2️⃣ 목적지 허브 기준 업체 배송 담당자 배정
+        DeliveryManager companyDeliveryManager = assignCompanyDeliveryManager(request.toHubId());
+
+        // 3️⃣ DTO 변환 후 반환
+        return DeliveryManagerAssignResponseDto.of(hubDeliveryManagers, companyDeliveryManager);
+    }
+
+    // HUB 배송 담당자 배정
+    private DeliveryManager assignHubDeliveryManager() {
+        List<DeliveryManager> hubManagers = deliveryManagerRepository
+            .findTop10ByDeliveryTypeOrderByLastDeliveryTimeAsc(DeliveryType.HUB);
+
+        DeliveryManager nextManager = hubManagers.get(0); // 가장 오래된 담당자
+        nextManager.recordDeliveryTime(); // 배정 후 시간 갱신
+        return nextManager;
+    }
+
+    // COMPANY 배송 담당자 배정
+    private DeliveryManager assignCompanyDeliveryManager(UUID hubId) {
+        List<DeliveryManager> companyManagers = deliveryManagerRepository
+            .findTop10ByDeliveryTypeAndHubIdOrderByLastDeliveryTimeAsc(DeliveryType.COMPANY, hubId);
+
+        DeliveryManager nextManager = companyManagers.get(0);
+        nextManager.recordDeliveryTime();
+        return nextManager;
+    }
+
+
+    //---------------------------------------------------------------
+    public int setDeliveryOrder(DeliveryType deliveryType, UUID hubId) {
+
+        Integer maxOrder = deliveryManagerRepository.findMaxDeliveryOrderByHubId(hubId);
+
+        int nextOrder = (maxOrder == null) ? 1 : maxOrder + 1;
+
+        log.info("배송 타입: {}, 현재 마지막 순번: {}, 생성된 순번: {}", deliveryType, maxOrder, nextOrder);
+
+        return nextOrder;
+    }
 }

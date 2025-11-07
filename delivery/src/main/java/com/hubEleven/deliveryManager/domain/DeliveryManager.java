@@ -52,6 +52,10 @@ public class DeliveryManager {
 		return new DeliveryManager(deliveryManagerId, hubId, slackId, deliveryType, deliveryOrder);
 	}
 
+	public void recordDeliveryTime() {
+		this.lastDeliveryTime = LocalDateTime.now();
+	}
+
 	// 임시
 	public void softDelete(Long deletedBy) {}
 }
