@@ -4,19 +4,24 @@ import com.hubEleven.common.annotation.SoftDeletable;
 import com.hubEleven.common.model.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
-
 @Entity
 @Getter
-@Table(name = "p_ai_request_log")
+@Table(name = "p_ai_request_log",
+        indexes = {
+                @Index(name = "idx_ai_req_order", columnList = "order_id"),
+                @Index(name = "idx_ai_req_status", columnList = "request_status")
+        })
 @SoftDeletable
+@NoArgsConstructor
 public class AiRequestLog extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "ai_request_log_id", nullable = false, updatable = false)
+    @Column(name = "ai_request_log_id", nullable = false)
     private UUID id;
 
     @Column(name = "order_id", nullable = false)
@@ -27,31 +32,42 @@ public class AiRequestLog extends BaseEntity {
     private RequestStatus status;
 
     @Lob
+    @Column(name = "raw_prompt", columnDefinition = "text")
     private String rawPrompt;
 
     @Lob
+    @Column(name = "raw_response", columnDefinition = "text")
     private String rawResponse;
 
-    protected AiRequestLog() {}
+    @Lob
+    @Column(name = "metadata_json", columnDefinition = "text")
+    private String metadataJson;
 
     private AiRequestLog(UUID orderId, RequestStatus status){
         this.orderId = orderId;
         this.status = status;
     }
 
-    public static AiRequestLog requested(UUID orderId) {
-        return new AiRequestLog(orderId, RequestStatus.REQUESTED);
+    private AiRequestLog(UUID id, UUID orderId, RequestStatus status, String prompt) {
+        this.id = id;
+        this.orderId = orderId;
+        this.status = status;
+        this.rawPrompt = prompt;
     }
 
-    public void success(String prompt, String response) {
+    public static AiRequestLog requested(UUID orderId, String prompt) {
+        return new AiRequestLog(UUID.randomUUID(), orderId, RequestStatus.REQUESTED, prompt);
+    }
+
+    public void success(String response, String metadataJson) {
         this.status = RequestStatus.SUCCESS;
-        this.rawPrompt = prompt;
         this.rawResponse = response;
+        this.metadataJson = metadataJson;
     }
 
-    public void fail(String prompt, String response) {
+    public void fail(String failurePayload, String metadataJson) {
         this.status = RequestStatus.FAIL;
-        this.rawPrompt = prompt;
-        this.rawResponse = response;
+        this.rawResponse = failurePayload;
+        this.metadataJson = metadataJson;
     }
 }
