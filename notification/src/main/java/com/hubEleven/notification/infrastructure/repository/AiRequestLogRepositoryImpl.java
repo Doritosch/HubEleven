@@ -23,4 +23,14 @@ public class AiRequestLogRepositoryImpl implements AiRequestLogRepository {
     public Optional<AiRequestLog> findById(UUID id){
         return repository.findById(id);
     }
+
+    @Override
+    public boolean existsByOrderId(UUID orderId){
+        return repository.existsByOrderId(orderId);
+    }
+
+    @Override
+    public Optional<AiRequestLog> findByOrderId(UUID orderId){
+        return repository.findByOrderId(orderId);
+    }
 }

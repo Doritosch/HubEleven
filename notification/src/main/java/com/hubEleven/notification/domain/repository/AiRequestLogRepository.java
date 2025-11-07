@@ -8,4 +8,6 @@ import java.util.UUID;
 public interface AiRequestLogRepository {
     AiRequestLog save(AiRequestLog aiRequestLog);
     Optional<AiRequestLog> findById(UUID id);
+    boolean existsByOrderId(UUID orderId);
+    Optional<AiRequestLog> findByOrderId(UUID orderId);
 }
