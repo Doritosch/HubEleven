@@ -16,10 +16,10 @@ public record MessageGenerationRequest(
         @NotEmpty @Valid List<Item> items,
         @Size(max = 1000) String requestNote,
         @NotBlank String fromHub,
-        @Valid List<String> viaHub,
+        @Valid List<String> viaHubs,
         @NotBlank String destination,
         @NotBlank String deliveryManagerName,
-        @Email String dliveryManagerEmail
+        @NotBlank @Email String deliveryManagerEmail
 ) {
     public static MessageGenerationRequest of(
             UUID orderId,
@@ -28,7 +28,7 @@ public record MessageGenerationRequest(
             LocalDateTime orderDateTime,
             List<Item> items,
             String requestNote,
-            String sourceHub,
+            String fromHub,
             List<String> viaHubs,
             String destination,
             String deliveryManagerName,
@@ -36,7 +36,7 @@ public record MessageGenerationRequest(
     ) {
         return new MessageGenerationRequest(
                 orderId, customerName, customerEmail, orderDateTime, items, requestNote,
-                sourceHub, viaHubs, destination, deliveryManagerName, deliveryManagerEmail
+                fromHub, viaHubs, destination, deliveryManagerName, deliveryManagerEmail
         );
     }
 
