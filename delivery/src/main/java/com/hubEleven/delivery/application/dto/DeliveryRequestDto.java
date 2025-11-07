@@ -1,7 +1,6 @@
 package com.hubEleven.delivery.application.dto;
 
 import com.hubEleven.delivery.domain.DeliveryStatus;
-
 import java.util.UUID;
 
 public record DeliveryRequestDto(
@@ -11,6 +10,6 @@ public record DeliveryRequestDto(
         UUID toHubId,
         String recipientName,
         String recipientSlackId,
-        Long deliveryManagerId
-) {
+        Long deliveryManagerId) {
+
 }
