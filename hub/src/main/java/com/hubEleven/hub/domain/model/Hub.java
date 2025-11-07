@@ -4,6 +4,8 @@ import com.hubEleven.hub.domain.vo.Location;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
@@ -22,7 +24,7 @@ import lombok.NoArgsConstructor;
 public class Hub {
 
 	@Id
-	@Column(name = "hub_id", columnDefinition = "BINARY(16)")
+	@GeneratedValue(strategy = GenerationType.UUID)
 	private UUID hubId;
 
 	@Column(name = "name", nullable = false, length = 100)
@@ -59,7 +61,6 @@ public class Hub {
 			String regionCode,
 			Long createdBy) {
 		return Hub.builder()
-				.hubId(UUID.randomUUID())
 				.name(name)
 				.location(Location.of(address, latitude, longitude))
 				.regionCode(regionCode)
