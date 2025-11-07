@@ -24,12 +24,6 @@ public record HubCreateRequestDto(
 				String regionCode) {
 
 	public CreateHubCommand toCommand() {
-		return new CreateHubCommand(
-			name,
-			address,
-			latitude,
-			longitude,
-			regionCode
-		);
+		return new CreateHubCommand(name, address, latitude, longitude, regionCode);
 	}
 }

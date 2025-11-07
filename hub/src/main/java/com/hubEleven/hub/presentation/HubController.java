@@ -42,9 +42,7 @@ public class HubController {
 
 	@PatchMapping("/{hubId}")
 	public HubResponseDto updateHub(
-		@PathVariable UUID hubId,
-		@Valid @RequestBody HubUpdateRequestDto request
-	) {
+			@PathVariable UUID hubId, @Valid @RequestBody HubUpdateRequestDto request) {
 		UpdateHubCommand command = request.toCommand(hubId);
 		HubResult result = hubService.updateHub(command);
 		return HubResponseDto.from(result);
