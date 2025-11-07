@@ -1,7 +1,8 @@
 package com.hubEleven.company.application.service;
 
+import static com.hubEleven.company.domain.exception.CompanyErrorCode.*;
+
 import com.hubEleven.common.code.ErrorCode;
-import com.hubEleven.common.exception.GlobalException;
 import com.hubEleven.common.request.CommonPageRequest;
 import com.hubEleven.common.response.CommonPageResponse;
 import com.hubEleven.common.utils.PagingUtils;
@@ -13,14 +14,11 @@ import com.hubEleven.company.domain.repository.CompanyRepository;
 import com.hubEleven.company.domain.repository.CompanySearchCondition;
 import com.hubEleven.company.infrastructure.client.HubClient;
 import com.hubEleven.company.presentation.request.CompanyRequests;
-import feign.FeignException;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import static com.hubEleven.company.domain.exception.CompanyErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -45,14 +43,18 @@ public class CompanyAppService {
 		if (companyRepository.existsByHubIdAndName(req.hubId(), req.name())) {
 			throw new com.hubEleven.common.exception.GlobalException(COMPANY_DUPLICATED);
 		}
-		Company company = Company.create(req.hubId(), req.name(), req.type(), req.slackId(), req.address());
+		Company company =
+				Company.create(req.hubId(), req.name(), req.type(), req.slackId(), req.address());
 		return CompanyDTO.from(companyRepository.save(company));
 	}
 
 	@Transactional
 	public CompanyDTO updateCompany(UUID companyId, CompanyRequests.Update req) {
-		var company = companyRepository.findById(companyId)
-				.orElseThrow(() -> new com.hubEleven.common.exception.GlobalException(COMPANY_NOT_FOUND));
+		var company =
+				companyRepository
+						.findById(companyId)
+						.orElseThrow(
+								() -> new com.hubEleven.common.exception.GlobalException(COMPANY_NOT_FOUND));
 
 		assertHubExists(company.getHubId());
 
@@ -69,31 +71,43 @@ public class CompanyAppService {
 
 	@Transactional(readOnly = true)
 	public CompanyDTO getCompany(UUID companyId) {
-		var company = companyRepository.findById(companyId)
-				.orElseThrow(() -> new com.hubEleven.common.exception.GlobalException(COMPANY_NOT_FOUND));
+		var company =
+				companyRepository
+						.findById(companyId)
+						.orElseThrow(
+								() -> new com.hubEleven.common.exception.GlobalException(COMPANY_NOT_FOUND));
 		return CompanyDTO.from(company);
 	}
 
 	@Transactional(readOnly = true)
 	public CommonPageResponse<CompanyDTO> findCompanyList(CommonPageRequest pageReq) {
-		var page = companyRepository.search(new CompanySearchCondition(null, null, null, null), pageReq.toPageable());
+		var page =
+				companyRepository.search(
+						new CompanySearchCondition(null, null, null, null), pageReq.toPageable());
 		return PagingUtils.convert(page, CompanyDTO::from);
 	}
 
 	@Transactional(readOnly = true)
 	public CommonPageResponse<CompanyDTO> searchCompany(
-			Optional<UUID> hubId, Optional<String> name, Optional<CompanyType> type,
-			Optional<CompanyStatus> status, CommonPageRequest pageReq) {
-		var cond = new CompanySearchCondition(
-				hubId.orElse(null), name.orElse(null), type.orElse(null), status.orElse(null));
+			Optional<UUID> hubId,
+			Optional<String> name,
+			Optional<CompanyType> type,
+			Optional<CompanyStatus> status,
+			CommonPageRequest pageReq) {
+		var cond =
+				new CompanySearchCondition(
+						hubId.orElse(null), name.orElse(null), type.orElse(null), status.orElse(null));
 		var page = companyRepository.search(cond, pageReq.toPageable());
 		return PagingUtils.convert(page, CompanyDTO::from);
 	}
 
 	@Transactional
 	public CompanyDTO changeStatus(UUID companyId, String rawStatus) {
-		var company = companyRepository.findById(companyId)
-				.orElseThrow(() -> new com.hubEleven.common.exception.GlobalException(COMPANY_NOT_FOUND));
+		var company =
+				companyRepository
+						.findById(companyId)
+						.orElseThrow(
+								() -> new com.hubEleven.common.exception.GlobalException(COMPANY_NOT_FOUND));
 
 		CompanyStatus newStatus;
 		try {
@@ -108,8 +122,11 @@ public class CompanyAppService {
 
 	@Transactional
 	public void deleteCompany(UUID companyId, Long deleterId) {
-		var company = companyRepository.findById(companyId)
-				.orElseThrow(() -> new com.hubEleven.common.exception.GlobalException(COMPANY_NOT_FOUND));
+		var company =
+				companyRepository
+						.findById(companyId)
+						.orElseThrow(
+								() -> new com.hubEleven.common.exception.GlobalException(COMPANY_NOT_FOUND));
 		company.delete(deleterId);
 	}
 }
