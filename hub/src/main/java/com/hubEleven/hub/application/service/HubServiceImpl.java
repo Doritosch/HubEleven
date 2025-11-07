@@ -5,7 +5,6 @@ import com.hubEleven.hub.application.command.DeleteHubCommand;
 import com.hubEleven.hub.application.command.UpdateHubCommand;
 import com.hubEleven.hub.application.dto.HubListResult;
 import com.hubEleven.hub.application.dto.HubResult;
-import com.hubEleven.hub.application.mapper.HubMapper;
 import com.hubEleven.hub.domain.model.Hub;
 import com.hubEleven.hub.domain.repository.HubRepository;
 import java.util.List;
@@ -50,7 +49,7 @@ public class HubServiceImpl implements HubService {
 						createdBy);
 
 		Hub saved = hubRepository.save(hub);
-		return HubMapper.toResult(saved);
+		return HubResult.from(saved);
 	}
 
 	@Override
@@ -81,7 +80,7 @@ public class HubServiceImpl implements HubService {
 				updatedBy);
 
 		// 더티체킹으로 반영
-		return HubMapper.toResult(hub);
+		return HubResult.from(hub);
 	}
 
 	@Override
@@ -105,7 +104,7 @@ public class HubServiceImpl implements HubService {
 				hubRepository
 						.findById(hubId)
 						.orElseThrow(() -> new IllegalArgumentException("해당 허브를 찾을 수 없습니다: " + hubId));
-		return HubMapper.toResult(hub);
+		return HubResult.from(hub);
 	}
 
 	@Override
@@ -114,6 +113,6 @@ public class HubServiceImpl implements HubService {
 		// 삭제되지 않은 Hub만 조회
 		List<Hub> hubs = hubRepository.findAllNotDeleted();
 
-		return new HubListResult(hubs.stream().map(HubMapper::toResult).toList());
+		return new HubListResult(hubs.stream().map(HubResult::from).toList());
 	}
 }

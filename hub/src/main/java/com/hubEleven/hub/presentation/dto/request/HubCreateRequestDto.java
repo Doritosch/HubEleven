@@ -1,5 +1,6 @@
 package com.hubEleven.hub.presentation.dto.request;
 
+import com.hubEleven.hub.application.command.CreateHubCommand;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -20,4 +21,15 @@ public record HubCreateRequestDto(
 				@Max(value = 180, message = "경도는 180 이하여야 합니다.")
 				Double longitude,
 		@NotBlank(message = "지역 코드는 필수 입력 항목입니다.") @Size(max = 50, message = "지역 코드는 50자 이하여야 합니다.")
-				String regionCode) {}
+				String regionCode) {
+
+	public CreateHubCommand toCommand() {
+		return new CreateHubCommand(
+			name,
+			address,
+			latitude,
+			longitude,
+			regionCode
+		);
+	}
+}
