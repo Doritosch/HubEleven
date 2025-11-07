@@ -2,18 +2,13 @@ name: Hub - Build & Test (Spring Boot)
 
 on:
   pull_request:
-    branches:
-      - '**'
+
     paths:
       - 'hub/**'
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        working-directory: hub
 
     steps:
       - name: Checkout repository
@@ -26,4 +21,4 @@ jobs:
           java-version: 17
 
       - name: Build with Gradle
-        run: ./gradlew clean build -x test --no-daemon
+        run: ./gradlew :hub:clean :hub:build -x test --no-daemon

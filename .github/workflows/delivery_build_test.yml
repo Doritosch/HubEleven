@@ -2,18 +2,12 @@ name: Delivery - Build & Test (Spring Boot)
 
 on:
   pull_request:
-    branches:
-      - '**'
     paths:
       - 'delivery/**'
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        working-directory: delivery
 
     steps:
       - name: Checkout repository
@@ -26,4 +20,4 @@ jobs:
           java-version: 17
 
       - name: Build with Gradle
-        run: ./gradlew clean build -x test --no-daemon
+        run: ./gradlew :delivery:clean :delivery:build -x test --no-daemon

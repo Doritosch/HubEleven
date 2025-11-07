@@ -2,19 +2,12 @@ name: Order - Build & Test (Spring Boot)
 
 on:
   pull_request:
-    branches:
-      - '**'
     paths:
       - 'order/**'
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        working-directory: order
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -26,4 +19,4 @@ jobs:
           java-version: 17
 
       - name: Build with Gradle
-        run: ./gradlew clean build -x test --no-daemon
+        run: ./gradlew :order:clean :order:build -x test --no-daemon
