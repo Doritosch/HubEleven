@@ -3,25 +3,21 @@ package com.hubEleven.deliveryManager.domain;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import org.springframework.data.domain.Pageable;
 
 public interface DeliveryManagerRepository {
 
-    DeliveryManager save(DeliveryManager deliveryManager);
+	DeliveryManager save(DeliveryManager deliveryManager);
 
 	Optional<DeliveryManager> findById(Long id);
 
 	List<DeliveryManager> findAll();
 
-	List<DeliveryManager> findAllByHubId(UUID hubId);
-
 	Integer findMaxDeliveryOrderByHubId(UUID hubId);
 
-	List<DeliveryManager> findNextAvailableManager(DeliveryType deliveryType, UUID hubId, Pageable pageable);
+    // 허브 담당자용 (hubId가 null인 경우)
+    Optional<DeliveryManager> findFirstByHubIdIsNullOrderByLastDeliveryTimeAscDeliveryOrderAsc();
 
-    DeliveryManager saveAndFlush(DeliveryManager deliveryManager);
-    Integer findMaxDeliveryOrderByHubAndType(UUID hubId, DeliveryType type);
-    List<DeliveryManager> findTop10ByDeliveryTypeAndHubIdOrderByLastDeliveryTimeAsc(DeliveryType type, UUID hubId);
-    List<DeliveryManager> findTop10ByDeliveryTypeOrderByLastDeliveryTimeAsc(DeliveryType type);
+    // 회사 담당자용 (hubId 지정)
+    Optional<DeliveryManager> findFirstByHubIdOrderByLastDeliveryTimeAscDeliveryOrderAsc(UUID hubId);
 
 }
