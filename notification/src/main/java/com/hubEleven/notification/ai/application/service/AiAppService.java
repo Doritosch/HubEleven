@@ -21,57 +21,56 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class AiAppService {
 
-    private final AiRequestLogRepository aiRequestLogRepository;
-    private final PromptDomainService promptDomainService;
-    private final GeminiClient geminiClient;
-    private final AiProperties aiProperties;
-    private final ObjectMapper objectMapper;
+	private final AiRequestLogRepository aiRequestLogRepository;
+	private final PromptDomainService promptDomainService;
+	private final GeminiClient geminiClient;
+	private final AiProperties aiProperties;
+	private final ObjectMapper objectMapper;
 
-    @Transactional
-    public MessageGenerationResponse generateDispatchGuidance(MessageGenerationRequest request) {
-        if (aiRequestLogRepository.existsByOrderId(request.orderId())) {
-            throw new GlobalException(NotificationErrorCode.AI_REQUEST_DUPLICATED);
-        }
+	@Transactional
+	public MessageGenerationResponse generateDispatchGuidance(MessageGenerationRequest request) {
+		if (aiRequestLogRepository.existsByOrderId(request.orderId())) {
+			throw new GlobalException(NotificationErrorCode.AI_REQUEST_DUPLICATED);
+		}
 
-        String prompt = promptDomainService.buildDispatchGuidancePrompt(request);
-        AiRequestLog log = aiRequestLogRepository.save(
-                AiRequestLog.requested(request.orderId(), prompt));
-        String metadata = serialize(request);
+		String prompt = promptDomainService.buildDispatchGuidancePrompt(request);
+		AiRequestLog log =
+				aiRequestLogRepository.save(AiRequestLog.requested(request.orderId(), prompt));
+		String metadata = serialize(request);
 
-        try {
-            GeminiResponse response =
-                    geminiClient.generate(aiProperties.model(), aiProperties.api().key(), prompt);
-            String raw = response.primaryText();
+		try {
+			GeminiResponse response =
+					geminiClient.generate(aiProperties.model(), aiProperties.api().key(), prompt);
+			String raw = response.primaryText();
 
-            MessageGenerationResponse result = parseResponse(raw);
-            log.success(raw, metadata);
-            return result;
-        } catch (GlobalException ex) {
-            log.fail(ex.getMessage(), metadata);
-            throw ex;
-        } catch (Exception ex) {
-            log.fail(ex.getMessage(), metadata);
-            throw new GlobalException(NotificationErrorCode.AI_GENERATION_FAIL);
-        }
-    }
+			MessageGenerationResponse result = parseResponse(raw);
+			log.success(raw, metadata);
+			return result;
+		} catch (GlobalException ex) {
+			log.fail(ex.getMessage(), metadata);
+			throw ex;
+		} catch (Exception ex) {
+			log.fail(ex.getMessage(), metadata);
+			throw new GlobalException(NotificationErrorCode.AI_GENERATION_FAIL);
+		}
+	}
 
-    private MessageGenerationResponse parseResponse(String rawJson) {
-        try {
-            ResponsePayload payload = objectMapper.readValue(rawJson, ResponsePayload.class);
-            return MessageGenerationResponse.of(
-                    payload.finalDispatchDeadline(), payload.messageBody());
-        } catch (JsonProcessingException e) {
-            throw new GlobalException(NotificationErrorCode.AI_RESPONSE_PARSE_FAIL);
-        }
-    }
+	private MessageGenerationResponse parseResponse(String rawJson) {
+		try {
+			ResponsePayload payload = objectMapper.readValue(rawJson, ResponsePayload.class);
+			return MessageGenerationResponse.of(payload.finalDispatchDeadline(), payload.messageBody());
+		} catch (JsonProcessingException e) {
+			throw new GlobalException(NotificationErrorCode.AI_RESPONSE_PARSE_FAIL);
+		}
+	}
 
-    private String serialize(MessageGenerationRequest request) {
-        try {
-            return objectMapper.writeValueAsString(request);
-        } catch (JsonProcessingException e) {
-            return null;
-        }
-    }
+	private String serialize(MessageGenerationRequest request) {
+		try {
+			return objectMapper.writeValueAsString(request);
+		} catch (JsonProcessingException e) {
+			return null;
+		}
+	}
 
-    private record ResponsePayload(String finalDispatchDeadline, String messageBody) {}
+	private record ResponsePayload(String finalDispatchDeadline, String messageBody) {}
 }
