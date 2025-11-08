@@ -40,6 +40,11 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    //OpenFeign
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
+    implementation project(':common')
 }
 
 dependencyManagement {
