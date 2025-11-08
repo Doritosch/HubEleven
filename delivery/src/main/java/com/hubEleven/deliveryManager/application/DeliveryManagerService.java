@@ -108,9 +108,9 @@ public class DeliveryManagerService {
 		UUID hubId = assignRequestDto.hubId();
 
 		// TODO : 해당 허브ID가 허브에 존재하는지 검증
-        DeliveryManager deliveryManager = getDeliveryManagerByType(deliveryType, hubId);
-        deliveryManager.recordDeliveryTime();
-        deliveryManagerRepository.save(deliveryManager);
+		DeliveryManager deliveryManager = getDeliveryManagerByType(deliveryType, hubId);
+		deliveryManager.recordDeliveryTime();
+		deliveryManagerRepository.save(deliveryManager);
 
 		UUID orderId = assignRequestDto.orderId();
 		return DeliveryManagerAssignResponseDto.of(orderId, deliveryManager);
@@ -129,7 +129,7 @@ public class DeliveryManagerService {
 
 	private DeliveryManager getDeliveryManagerByType(DeliveryType deliveryType, UUID hubId) {
 
-        return switch (deliveryType) {
+		return switch (deliveryType) {
 			case HUB -> deliveryManagerRepository
 					.findFirstByHubIdIsNullOrderByLastDeliveryTimeAscDeliveryOrderAsc()
 					.orElseThrow(() -> new IllegalArgumentException("허브 배송 담당자가 존재하지 않습니다."));

@@ -21,10 +21,9 @@ public interface DeliveryManagerJpaRepository extends JpaRepository<DeliveryMana
 """)
 	Integer findMaxDeliveryOrderByHubId(@Param("hubId") UUID hubId);
 
-    // 허브 담당자용 (hubId가 null인 경우)
-    Optional<DeliveryManager> findFirstByHubIdIsNullOrderByLastDeliveryTimeAscDeliveryOrderAsc();
+	// 허브 담당자용 (hubId가 null인 경우)
+	Optional<DeliveryManager> findFirstByHubIdIsNullOrderByLastDeliveryTimeAscDeliveryOrderAsc();
 
-    // 회사 담당자용 (hubId 지정)
-    Optional<DeliveryManager> findFirstByHubIdOrderByLastDeliveryTimeAscDeliveryOrderAsc(UUID hubId);
-
+	// 회사 담당자용 (hubId 지정)
+	Optional<DeliveryManager> findFirstByHubIdOrderByLastDeliveryTimeAscDeliveryOrderAsc(UUID hubId);
 }

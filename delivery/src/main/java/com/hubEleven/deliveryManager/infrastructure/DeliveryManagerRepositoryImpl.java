@@ -36,15 +36,17 @@ public class DeliveryManagerRepositoryImpl implements DeliveryManagerRepository 
 		return deliveryManagerJpaRepository.findMaxDeliveryOrderByHubId(hubId);
 	}
 
+	@Override
+	public Optional<DeliveryManager>
+			findFirstByHubIdIsNullOrderByLastDeliveryTimeAscDeliveryOrderAsc() {
+		return deliveryManagerJpaRepository
+				.findFirstByHubIdIsNullOrderByLastDeliveryTimeAscDeliveryOrderAsc();
+	}
 
-    @Override
-    public Optional<DeliveryManager> findFirstByHubIdIsNullOrderByLastDeliveryTimeAscDeliveryOrderAsc() {
-        return deliveryManagerJpaRepository.findFirstByHubIdIsNullOrderByLastDeliveryTimeAscDeliveryOrderAsc();
-    }
-
-    @Override
-    public Optional<DeliveryManager> findFirstByHubIdOrderByLastDeliveryTimeAscDeliveryOrderAsc(
-        UUID hubId) {
-        return deliveryManagerJpaRepository.findFirstByHubIdOrderByLastDeliveryTimeAscDeliveryOrderAsc(hubId);
-    }
+	@Override
+	public Optional<DeliveryManager> findFirstByHubIdOrderByLastDeliveryTimeAscDeliveryOrderAsc(
+			UUID hubId) {
+		return deliveryManagerJpaRepository.findFirstByHubIdOrderByLastDeliveryTimeAscDeliveryOrderAsc(
+				hubId);
+	}
 }
