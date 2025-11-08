@@ -9,43 +9,55 @@ import java.util.UUID;
 
 //최종 발송 시한 산출을 위해 AI에게 전달할 주문/배송 컨텍스트
 public record MessageGenerationRequest(
-        @NotNull UUID orderId,
-        @NotBlank String customerName,
-        @Email String customerEmail,
-        @NotNull @PastOrPresent LocalDateTime orderDateTime,
-        @NotEmpty @Valid List<Item> items,
-        @Size(max = 1000) String requestNote,
-        @NotBlank String fromHub,
-        @Valid List<String> viaHubs,
-        @NotBlank String destination,
-        @NotBlank String deliveryManagerName,
-        @NotBlank @Email String deliveryManagerEmail
+        UUID orderId,
+        String customerName,
+        String customerEmail,
+        LocalDateTime orderDateTime,
+        LocalDateTime requestedArrivalDateTime,
+        String sourceHub,
+        List<String> viaHubs,
+        String destinationHub,
+        String destinationAddress,
+        String requestNote,
+        String deliveryManagerName,
+        String deliveryManagerEmail,
+        List<Item> items
 ) {
     public static MessageGenerationRequest of(
             UUID orderId,
             String customerName,
             String customerEmail,
             LocalDateTime orderDateTime,
-            List<Item> items,
-            String requestNote,
-            String fromHub,
+            LocalDateTime requestedArrivalDateTime,
+            String sourceHub,
             List<String> viaHubs,
-            String destination,
+            String destinationHub,
+            String destinationAddress,
+            String requestNote,
             String deliveryManagerName,
-            String deliveryManagerEmail
+            String deliveryManagerEmail,
+            List<Item> items
     ) {
         return new MessageGenerationRequest(
-                orderId, customerName, customerEmail, orderDateTime, items, requestNote,
-                fromHub, viaHubs, destination, deliveryManagerName, deliveryManagerEmail
+                orderId,
+                customerName,
+                customerEmail,
+                orderDateTime,
+                requestedArrivalDateTime,
+                sourceHub,
+                viaHubs,
+                destinationHub,
+                destinationAddress,
+                requestNote,
+                deliveryManagerName,
+                deliveryManagerEmail,
+                items
         );
     }
 
-    public record Item(
-            @NotBlank @Size(max = 200) String name,
-            @Positive int quantity
-    ) {
-        public static Item of(String name, int quantity) {
-            return new Item(name, quantity);
+    public record Item(String name, int quantity, String note) {
+        public static Item of(String name, int quantity, String note) {
+            return new Item(name, quantity, note);
         }
     }
 }
