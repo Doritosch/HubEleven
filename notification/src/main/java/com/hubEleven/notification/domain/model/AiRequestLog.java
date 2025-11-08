@@ -43,20 +43,14 @@ public class AiRequestLog extends BaseEntity {
     @Column(name = "metadata_json", columnDefinition = "text")
     private String metadataJson;
 
-    private AiRequestLog(UUID orderId, RequestStatus status){
-        this.orderId = orderId;
-        this.status = status;
-    }
-
-    private AiRequestLog(UUID id, UUID orderId, RequestStatus status, String prompt) {
-        this.id = id;
+    private AiRequestLog(UUID orderId, RequestStatus status, String prompt) {
         this.orderId = orderId;
         this.status = status;
         this.rawPrompt = prompt;
     }
 
     public static AiRequestLog requested(UUID orderId, String prompt) {
-        return new AiRequestLog(UUID.randomUUID(), orderId, RequestStatus.REQUESTED, prompt);
+        return new AiRequestLog(orderId, RequestStatus.REQUESTED, prompt);
     }
 
     public void success(String response, String metadataJson) {
