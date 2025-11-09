@@ -23,7 +23,9 @@ public class AiController {
 
 	private final AiAppService aiAppService;
 
-	@Operation(summary = "Ai 배송 안내 메시지 생성 API", description = "주문, 경로, 담당자 정보를 바탕으로 Gemini로 최종 발송 시한과 slack 메세지 내용을 생성한다.")
+	@Operation(
+			summary = "Ai 배송 안내 메시지 생성 API",
+			description = "주문, 경로, 담당자 정보를 바탕으로 Gemini로 최종 발송 시한과 slack 메세지 내용을 생성한다.")
 	@PostMapping("/messages")
 	public ResponseEntity<ApiResponse<MessageGenerationResponse>> generateMessage(
 			@Valid @RequestBody MessageGenerateRequest request) {
