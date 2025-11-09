@@ -44,18 +44,23 @@ public class AiAppService {
 			GeminiResponse response =
 					geminiClient.generate(aiProperties.model(), aiProperties.api().key(), prompt);
 			String raw = response.primaryText();
-			
+
 			log.info("Gemini raw response for orderId: {} - {}", request.orderId(), raw);
 
 			MessageGenerationResponse result = parseResponse(raw);
 			requestLog.success(raw, metadata);
 			return result;
 		} catch (GlobalException ex) {
-			log.error("GlobalException occurred for orderId: {} - {}", request.orderId(), ex.getMessage(), ex);
+			log.error(
+					"GlobalException occurred for orderId: {} - {}", request.orderId(), ex.getMessage(), ex);
 			requestLog.fail(ex.getMessage(), metadata);
 			throw ex;
 		} catch (Exception ex) {
-			log.error("Unexpected exception occurred for orderId: {} - {}", request.orderId(), ex.getMessage(), ex);
+			log.error(
+					"Unexpected exception occurred for orderId: {} - {}",
+					request.orderId(),
+					ex.getMessage(),
+					ex);
 			requestLog.fail(ex.getMessage(), metadata);
 			throw new GlobalException(NotificationErrorCode.AI_GENERATION_FAIL);
 		}
@@ -66,9 +71,9 @@ public class AiAppService {
 			// 코드 블록(```json, ```) 제거
 			String cleanedJson = cleanJsonResponse(rawJson);
 			log.debug("Cleaned JSON response: {}", cleanedJson);
-			
+
 			ResponsePayload payload = objectMapper.readValue(cleanedJson, ResponsePayload.class);
-			
+
 			// 필수 필드 검증
 			if (payload.finalDispatchDeadline() == null || payload.finalDispatchDeadline().isBlank()) {
 				log.error("finalDispatchDeadline is null or blank in response: {}", cleanedJson);
@@ -78,7 +83,7 @@ public class AiAppService {
 				log.error("messageBody is null or blank in response: {}", cleanedJson);
 				throw new GlobalException(NotificationErrorCode.AI_RESPONSE_PARSE_FAIL);
 			}
-			
+
 			return MessageGenerationResponse.success(
 					payload.finalDispatchDeadline(), payload.messageBody());
 		} catch (JsonProcessingException e) {
@@ -96,20 +101,20 @@ public class AiAppService {
 		if (rawJson == null || rawJson.isBlank()) {
 			return rawJson;
 		}
-		
+
 		String cleaned = rawJson.trim();
-		
+
 		// ```json ... ``` 형태의 코드 블록 제거
 		if (cleaned.startsWith("```json")) {
 			cleaned = cleaned.substring(7); // "```json" 제거
 		} else if (cleaned.startsWith("```")) {
 			cleaned = cleaned.substring(3); // "```" 제거
 		}
-		
+
 		if (cleaned.endsWith("```")) {
 			cleaned = cleaned.substring(0, cleaned.length() - 3); // "```" 제거
 		}
-		
+
 		return cleaned.trim();
 	}
 
