@@ -13,9 +13,11 @@ import com.hubEleven.notification.ai.infrastructure.client.GeminiClient;
 import com.hubEleven.notification.ai.infrastructure.client.dto.GeminiResponse;
 import com.hubEleven.notification.ai.infrastructure.configuration.AiProperties;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -34,7 +36,7 @@ public class AiAppService {
 		}
 
 		String prompt = promptDomainService.buildDispatchGuidancePrompt(request);
-		AiRequestLog log =
+		AiRequestLog requestLog =
 				aiRequestLogRepository.save(AiRequestLog.requested(request.orderId(), prompt));
 		String metadata = serialize(request);
 
@@ -42,27 +44,73 @@ public class AiAppService {
 			GeminiResponse response =
 					geminiClient.generate(aiProperties.model(), aiProperties.api().key(), prompt);
 			String raw = response.primaryText();
+			
+			log.info("Gemini raw response for orderId: {} - {}", request.orderId(), raw);
 
 			MessageGenerationResponse result = parseResponse(raw);
-			log.success(raw, metadata);
+			requestLog.success(raw, metadata);
 			return result;
 		} catch (GlobalException ex) {
-			log.fail(ex.getMessage(), metadata);
+			log.error("GlobalException occurred for orderId: {} - {}", request.orderId(), ex.getMessage(), ex);
+			requestLog.fail(ex.getMessage(), metadata);
 			throw ex;
 		} catch (Exception ex) {
-			log.fail(ex.getMessage(), metadata);
+			log.error("Unexpected exception occurred for orderId: {} - {}", request.orderId(), ex.getMessage(), ex);
+			requestLog.fail(ex.getMessage(), metadata);
 			throw new GlobalException(NotificationErrorCode.AI_GENERATION_FAIL);
 		}
 	}
 
 	private MessageGenerationResponse parseResponse(String rawJson) {
 		try {
-			ResponsePayload payload = objectMapper.readValue(rawJson, ResponsePayload.class);
+			// 코드 블록(```json, ```) 제거
+			String cleanedJson = cleanJsonResponse(rawJson);
+			log.debug("Cleaned JSON response: {}", cleanedJson);
+			
+			ResponsePayload payload = objectMapper.readValue(cleanedJson, ResponsePayload.class);
+			
+			// 필수 필드 검증
+			if (payload.finalDispatchDeadline() == null || payload.finalDispatchDeadline().isBlank()) {
+				log.error("finalDispatchDeadline is null or blank in response: {}", cleanedJson);
+				throw new GlobalException(NotificationErrorCode.AI_RESPONSE_PARSE_FAIL);
+			}
+			if (payload.messageBody() == null || payload.messageBody().isBlank()) {
+				log.error("messageBody is null or blank in response: {}", cleanedJson);
+				throw new GlobalException(NotificationErrorCode.AI_RESPONSE_PARSE_FAIL);
+			}
+			
 			return MessageGenerationResponse.success(
 					payload.finalDispatchDeadline(), payload.messageBody());
 		} catch (JsonProcessingException e) {
+			log.error("Failed to parse Gemini response as JSON. Raw response: {}", rawJson, e);
+			throw new GlobalException(NotificationErrorCode.AI_RESPONSE_PARSE_FAIL);
+		} catch (GlobalException e) {
+			throw e;
+		} catch (Exception e) {
+			log.error("Unexpected error while parsing response: {}", rawJson, e);
 			throw new GlobalException(NotificationErrorCode.AI_RESPONSE_PARSE_FAIL);
 		}
+	}
+
+	private String cleanJsonResponse(String rawJson) {
+		if (rawJson == null || rawJson.isBlank()) {
+			return rawJson;
+		}
+		
+		String cleaned = rawJson.trim();
+		
+		// ```json ... ``` 형태의 코드 블록 제거
+		if (cleaned.startsWith("```json")) {
+			cleaned = cleaned.substring(7); // "```json" 제거
+		} else if (cleaned.startsWith("```")) {
+			cleaned = cleaned.substring(3); // "```" 제거
+		}
+		
+		if (cleaned.endsWith("```")) {
+			cleaned = cleaned.substring(0, cleaned.length() - 3); // "```" 제거
+		}
+		
+		return cleaned.trim();
 	}
 
 	private String serialize(MessageGenerationRequest request) {
