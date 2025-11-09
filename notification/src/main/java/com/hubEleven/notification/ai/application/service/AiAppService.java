@@ -59,9 +59,7 @@ public class AiAppService {
 		try {
 			ResponsePayload payload = objectMapper.readValue(rawJson, ResponsePayload.class);
 			return MessageGenerationResponse.success(
-					payload.finalDispatchDeadline(),
-					payload.messageBody()
-			);
+					payload.finalDispatchDeadline(), payload.messageBody());
 		} catch (JsonProcessingException e) {
 			throw new GlobalException(NotificationErrorCode.AI_RESPONSE_PARSE_FAIL);
 		}
