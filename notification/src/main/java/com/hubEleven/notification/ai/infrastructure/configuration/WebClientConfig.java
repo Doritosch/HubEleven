@@ -21,7 +21,7 @@ public class WebClientConfig {
 
 	@Bean
 	public WebClient geminiWebClient() {
-		int timeoutMs = 5000;
+		int timeoutMs = 30000;
 
 		HttpClient httpClient =
 				HttpClient.create()
