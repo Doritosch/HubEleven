@@ -2,18 +2,12 @@ name: Company - Build & Test (Spring Boot)
 
 on:
   pull_request:
-    branches:
-      - '**'
     paths:
       - 'company/**'
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        working-directory: company
 
     steps:
       - name: Checkout repository
@@ -25,8 +19,5 @@ jobs:
           distribution: 'temurin'
           java-version: 17
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x ./gradlew
-
       - name: Build with Gradle
-        run: ./gradlew build -x test
+        run: ./gradlew :company:clean :company:build -x test --no-daemon
