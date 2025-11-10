@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 public interface DeliveryManagerRepository {
 
@@ -12,6 +13,8 @@ public interface DeliveryManagerRepository {
 	Optional<DeliveryManager> findById(Long id);
 
 	Page<DeliveryManager> findAll(Pageable pageable);
+
+    Page<DeliveryManager> findAll(Specification<DeliveryManager> spec, Pageable pageable);
 
     Page<DeliveryManager> findAllByHubId(UUID hubId, Pageable pageable);
 

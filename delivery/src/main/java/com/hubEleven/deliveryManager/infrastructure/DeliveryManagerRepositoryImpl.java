@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -31,6 +32,13 @@ public class DeliveryManagerRepositoryImpl implements DeliveryManagerRepository 
 	public Page<DeliveryManager> findAll(Pageable pageable) {
 		return deliveryManagerJpaRepository.findAll(pageable);
 	}
+
+    // ✅ Specification 기반 조회 위임
+    @Override
+    public Page<DeliveryManager> findAll(Specification<DeliveryManager> spec, Pageable pageable) {
+        return deliveryManagerJpaRepository.findAll(spec, pageable);
+    }
+
 
     @Override
     public Page<DeliveryManager> findAllByHubId(UUID hubId, Pageable pageable) {

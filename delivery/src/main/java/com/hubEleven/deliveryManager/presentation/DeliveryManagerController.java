@@ -6,6 +6,7 @@ import com.commonLib.common.response.ApiResponse;
 import com.commonLib.common.response.ApiResponseEntity;
 import com.commonLib.common.response.CommonPageResponse;
 import com.hubEleven.deliveryManager.application.DeliveryManagerService;
+import com.hubEleven.deliveryManager.domain.DeliveryType;
 import com.hubEleven.deliveryManager.presentation.dto.request.DeliveryManagerAssignRequestDto;
 import com.hubEleven.deliveryManager.presentation.dto.request.DeliveryManagerCreateRequestDto;
 import com.hubEleven.deliveryManager.presentation.dto.response.DeliveryManagerAssignResponseDto;
@@ -117,13 +118,33 @@ public class DeliveryManagerController {
 
     }
 
-//search
-//    public ResponseEntity<ApiResponse<CommonPageResponse<DeliveryManagerResponseDto>>> search(
-//        @RequestParam(defaultValue = "0") int page,
-//        @RequestParam(defaultValue = "10") int size,
-//        @RequestParam(defaultValue = "CREATED_AT") CommonPageRequest.SortType sortType,
-//        @RequestParam(defaultValue = "DESC") Sort.Direction direction,
-//        @RequestParam(required = false) String keyword ) {
-//    }
+    //search
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<CommonPageResponse<DeliveryManagerResponseDto>>> searchDeliveryManagers(
+        @RequestParam(required = false) UUID deliveryManagerId,
+        @RequestParam(required = false) UUID hubId,
+        @RequestParam(required = false) DeliveryType deliveryType,
+        @RequestParam(required = false) String slackId,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size,
+        @RequestParam(defaultValue = "CREATED_AT") CommonPageRequest.SortType sortType,
+        @RequestParam(defaultValue = "DESC") Sort.Direction direction,
+        @RequestParam(required = false) String keyword
+    ) {
+        CommonPageRequest pageRequest = new CommonPageRequest(page, size, sortType, direction, keyword);
+
+        Page<DeliveryManagerResponseDto> response = deliveryManagerService.searchDeliveryManager(
+            deliveryManagerId,
+            hubId,
+            deliveryType,
+            slackId,
+            pageRequest.toPageable()
+        );
+
+        CommonPageResponse<DeliveryManagerResponseDto> responseDtoList =
+            CommonPageResponse.of(response);
+        return ApiResponseEntity.success(responseDtoList);
+    }
+
 
 }
