@@ -55,8 +55,7 @@ public class CompanyAppService {
 		var company =
 				companyRepository
 						.findById(companyId)
-						.orElseThrow(
-								() -> new GlobalException(COMPANY_NOT_FOUND));
+						.orElseThrow(() -> new GlobalException(COMPANY_NOT_FOUND));
 
 		assertHubExists(company.getHubId());
 
@@ -76,8 +75,7 @@ public class CompanyAppService {
 		var company =
 				companyRepository
 						.findById(companyId)
-						.orElseThrow(
-								() -> new GlobalException(COMPANY_NOT_FOUND));
+						.orElseThrow(() -> new GlobalException(COMPANY_NOT_FOUND));
 		return CompanyDTO.from(company);
 	}
 
@@ -108,15 +106,13 @@ public class CompanyAppService {
 		var company =
 				companyRepository
 						.findById(companyId)
-						.orElseThrow(
-								() -> new GlobalException(COMPANY_NOT_FOUND));
+						.orElseThrow(() -> new GlobalException(COMPANY_NOT_FOUND));
 
 		CompanyStatus newStatus;
 		try {
 			newStatus = CompanyStatus.valueOf(rawStatus.toUpperCase());
 		} catch (IllegalArgumentException e) {
-			throw new com.hubEleven.common.exception.GlobalException(
-					ErrorCode.VALIDATION_ERROR);
+			throw new com.hubEleven.common.exception.GlobalException(ErrorCode.VALIDATION_ERROR);
 		}
 		company.changeStatus(newStatus);
 		return CompanyDTO.from(company);
@@ -127,8 +123,7 @@ public class CompanyAppService {
 		var company =
 				companyRepository
 						.findById(companyId)
-						.orElseThrow(
-								() -> new GlobalException(CompanyErrorCode.COMPANY_NOT_FOUND));
+						.orElseThrow(() -> new GlobalException(CompanyErrorCode.COMPANY_NOT_FOUND));
 		company.delete(deleterId);
 	}
 }
