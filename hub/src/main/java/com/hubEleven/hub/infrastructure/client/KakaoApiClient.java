@@ -1,6 +1,6 @@
 package com.hubEleven.hub.infrastructure.client;
 
-import com.hubEleven.common.exception.GlobalException;
+import com.commonLib.common.exception.GlobalException;
 import com.hubEleven.hub.common.exception.HubErrorCode;
 import com.hubEleven.hub.infrastructure.config.KakaoApiProperties;
 import java.io.BufferedReader;

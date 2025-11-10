@@ -1,6 +1,6 @@
 package com.hubEleven.hub.application.service;
 
-import com.hubEleven.common.exception.GlobalException;
+import com.commonLib.common.exception.GlobalException;
 import com.hubEleven.hub.application.command.CreateHubCommand;
 import com.hubEleven.hub.application.command.DeleteHubCommand;
 import com.hubEleven.hub.application.command.UpdateHubCommand;
@@ -31,9 +31,8 @@ public class HubServiceImpl implements HubService {
 
 	/*
 	 *  1. 감사 로그 전체적으로 수정
-	 *  2. 허브 등록 및 수정 시 위도 경도 외부 API 연결 -> 주소를 통해 해당 주소의 위도 경도 받아오기 (Kakao Local API) ✅
-	 *  3. Hub 위치 정보 수정 시 허브 경로 재배치
-	 *  4. createdBy/updatedBy/deletedBy를 Gateway 완성 후 받아오기
+	 *  2. Hub 위치 정보 수정 시 허브 경로 재배치
+	 *  3. createdBy/updatedBy/deletedBy를 Gateway 완성 후 받아오기
 	 * */
 	@Override
 	public HubResult createHub(CreateHubCommand command) {
