@@ -32,3 +32,6 @@ gemini:
   api:
     key: ${GEMINI_KEY}
   model: gemini-2.5-flash
+
+slack:
+  webhook-url: ${SLACK_WEBHOOK_URL}
