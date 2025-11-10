@@ -1,7 +1,7 @@
 package com.hubEleven.hub.presentation;
 
-import com.hubEleven.common.response.ApiResponse;
-import com.hubEleven.common.response.ApiResponseEntity;
+import com.commonLib.common.response.ApiResponse;
+import com.commonLib.common.response.ApiResponseEntity;
 import com.hubEleven.hub.application.command.CreateHubCommand;
 import com.hubEleven.hub.application.command.DeleteHubCommand;
 import com.hubEleven.hub.application.command.UpdateHubCommand;
