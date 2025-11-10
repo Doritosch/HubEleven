@@ -41,7 +41,12 @@ spring:
               uri: lb://notification-service
               predicates:
                 - Path=/v1/ai/**
+
+            - id: notification-service
+              uri: lb://notification-service
+              predicates:
                 - Path=/v1/slack/**
+
           discovery:
             locator:
               enabled: true
