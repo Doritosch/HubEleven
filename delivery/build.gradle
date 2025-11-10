@@ -44,7 +44,7 @@ dependencies {
     //OpenFeign
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 
-    implementation 'com.github.Doritosch:commonLib:1.0.0'
+    implementation 'com.github.Doritosch:commonLib:1.0.2'
 }
 
 dependencyManagement {
