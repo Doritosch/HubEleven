@@ -32,7 +32,13 @@ public class DeliveryManagerRepositoryImpl implements DeliveryManagerRepository 
 		return deliveryManagerJpaRepository.findAll(pageable);
 	}
 
-	@Override
+    @Override
+    public Page<DeliveryManager> findAllByHubId(UUID hubId, Pageable pageable) {
+        return deliveryManagerJpaRepository.findAllByHubId(hubId, pageable);
+    }
+
+
+    @Override
 	public Integer findMaxDeliveryOrderByHubId(UUID hubId) {
 		return deliveryManagerJpaRepository.findMaxDeliveryOrderByHubId(hubId);
 	}

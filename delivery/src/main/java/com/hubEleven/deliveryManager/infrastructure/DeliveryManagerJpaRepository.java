@@ -1,16 +1,15 @@
 package com.hubEleven.deliveryManager.infrastructure;
 
 import com.hubEleven.deliveryManager.domain.DeliveryManager;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface DeliveryManagerJpaRepository extends JpaRepository<DeliveryManager, Long> {
-
-	List<DeliveryManager> findByHubId(UUID hubId);
 
 	@Query(
 			"""
@@ -28,4 +27,7 @@ public interface DeliveryManagerJpaRepository extends JpaRepository<DeliveryMana
 	Optional<DeliveryManager> findFirstByHubIdOrderByLastDeliveryTimeAscDeliveryOrderAsc(UUID hubId);
 
     boolean existsByHubIdAndDeliveryManagerId(UUID hubId, Long managerId);
+
+    Page<DeliveryManager> findAllByHubId(UUID hubId, Pageable pageable);
+
 }

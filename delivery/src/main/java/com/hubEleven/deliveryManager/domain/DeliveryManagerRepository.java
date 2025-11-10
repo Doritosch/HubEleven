@@ -13,7 +13,9 @@ public interface DeliveryManagerRepository {
 
 	Page<DeliveryManager> findAll(Pageable pageable);
 
-	Integer findMaxDeliveryOrderByHubId(UUID hubId);
+    Page<DeliveryManager> findAllByHubId(UUID hubId, Pageable pageable);
+
+    Integer findMaxDeliveryOrderByHubId(UUID hubId);
 
 	// 허브 담당자용 (hubId가 null인 경우)
 	Optional<DeliveryManager> findFirstByHubIdIsNullOrderByLastDeliveryTimeAscDeliveryOrderAsc();

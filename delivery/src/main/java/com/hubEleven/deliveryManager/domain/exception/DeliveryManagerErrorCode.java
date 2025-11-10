@@ -13,7 +13,9 @@ public enum DeliveryManagerErrorCode implements StatusCode {
     INVALID_DELIVERY_TYPE(HttpStatus.BAD_REQUEST, "잘못된 담당 유형입니다."),
     ASSIGNMENT_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "배송담당자 배정에 실패하였습니다."),
     NO_AVAILABLE_MANAGER(HttpStatus.NOT_FOUND, "배정 가능한 배송 담당자가 존재하지 않습니다."),
-    INVALID_ASSIGNMENT_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청형식입니다.");
+    INVALID_ASSIGNMENT_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청형식입니다."),
+
+    HUB_NOR_FOUND(HttpStatus.NOT_FOUND, "허브가 존재하지 않습니다.");
 
     private final HttpStatus httpStatus;
     private final String message;
