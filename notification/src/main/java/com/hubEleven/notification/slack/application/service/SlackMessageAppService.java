@@ -20,6 +20,8 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -166,11 +168,13 @@ public class SlackMessageAppService {
 						});
 	}
 
-	// TODO: UserId 가지고 오기
 	private Long getCurrentUserId() {
-		var authentication = SecurityContextHolder.getContext().getAuthentication();
-		if (authentication != null && authentication.getPrincipal() instanceof Long userId) {
-			return userId;
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth instanceof JwtAuthenticationToken token) {
+			Object claim = token.getToken().getClaim("userId");
+			if (claim instanceof Integer i) return i.longValue();
+			if (claim instanceof Long l) return l;
+			if (claim instanceof String s) return Long.parseLong(s);
 		}
 		return null;
 	}
