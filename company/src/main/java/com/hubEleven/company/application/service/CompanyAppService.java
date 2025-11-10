@@ -3,10 +3,12 @@ package com.hubEleven.company.application.service;
 import static com.hubEleven.company.domain.exception.CompanyErrorCode.*;
 
 import com.hubEleven.common.code.ErrorCode;
+import com.hubEleven.common.exception.GlobalException;
 import com.hubEleven.common.request.CommonPageRequest;
 import com.hubEleven.common.response.CommonPageResponse;
 import com.hubEleven.common.utils.PagingUtils;
 import com.hubEleven.company.application.dto.CompanyDTO;
+import com.hubEleven.company.domain.exception.CompanyErrorCode;
 import com.hubEleven.company.domain.model.Company;
 import com.hubEleven.company.domain.model.CompanyStatus;
 import com.hubEleven.company.domain.model.CompanyType;
@@ -31,7 +33,7 @@ public class CompanyAppService {
 		try {
 			hubClient.getHub(hubId);
 		} catch (feign.FeignException.NotFound e) {
-			throw new com.hubEleven.common.exception.GlobalException(HUB_NOT_FOUND);
+			throw new GlobalException(CompanyErrorCode.HUB_NOT_FOUND);
 		} catch (feign.FeignException e) {
 			throw new com.hubEleven.common.exception.GlobalException(ErrorCode.SERVER_ERROR);
 		}
@@ -41,7 +43,7 @@ public class CompanyAppService {
 	public CompanyDTO createCompany(CompanyRequests.Create req) {
 		assertHubExists(req.hubId());
 		if (companyRepository.existsByHubIdAndName(req.hubId(), req.name())) {
-			throw new com.hubEleven.common.exception.GlobalException(COMPANY_DUPLICATED);
+			throw new GlobalException(COMPANY_DUPLICATED);
 		}
 		Company company =
 				Company.create(req.hubId(), req.name(), req.type(), req.slackId(), req.address());
@@ -54,14 +56,14 @@ public class CompanyAppService {
 				companyRepository
 						.findById(companyId)
 						.orElseThrow(
-								() -> new com.hubEleven.common.exception.GlobalException(COMPANY_NOT_FOUND));
+								() -> new GlobalException(COMPANY_NOT_FOUND));
 
 		assertHubExists(company.getHubId());
 
 		if (req.name() != null && !req.name().isBlank()) {
 			boolean changed = !req.name().equalsIgnoreCase(company.getName());
 			if (changed && companyRepository.existsByHubIdAndName(company.getHubId(), req.name())) {
-				throw new com.hubEleven.common.exception.GlobalException(COMPANY_DUPLICATED);
+				throw new GlobalException(COMPANY_DUPLICATED);
 			}
 		}
 		company.changeType(req.type());
@@ -75,7 +77,7 @@ public class CompanyAppService {
 				companyRepository
 						.findById(companyId)
 						.orElseThrow(
-								() -> new com.hubEleven.common.exception.GlobalException(COMPANY_NOT_FOUND));
+								() -> new GlobalException(COMPANY_NOT_FOUND));
 		return CompanyDTO.from(company);
 	}
 
@@ -107,14 +109,14 @@ public class CompanyAppService {
 				companyRepository
 						.findById(companyId)
 						.orElseThrow(
-								() -> new com.hubEleven.common.exception.GlobalException(COMPANY_NOT_FOUND));
+								() -> new GlobalException(COMPANY_NOT_FOUND));
 
 		CompanyStatus newStatus;
 		try {
 			newStatus = CompanyStatus.valueOf(rawStatus.toUpperCase());
 		} catch (IllegalArgumentException e) {
 			throw new com.hubEleven.common.exception.GlobalException(
-					com.hubEleven.common.code.ErrorCode.VALIDATION_ERROR); // 공통 코드
+					ErrorCode.VALIDATION_ERROR);
 		}
 		company.changeStatus(newStatus);
 		return CompanyDTO.from(company);
@@ -126,7 +128,7 @@ public class CompanyAppService {
 				companyRepository
 						.findById(companyId)
 						.orElseThrow(
-								() -> new com.hubEleven.common.exception.GlobalException(COMPANY_NOT_FOUND));
+								() -> new GlobalException(CompanyErrorCode.COMPANY_NOT_FOUND));
 		company.delete(deleterId);
 	}
 }
