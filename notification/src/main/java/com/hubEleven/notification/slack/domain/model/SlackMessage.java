@@ -4,6 +4,7 @@ import com.hubEleven.common.annotation.SoftDeletable;
 import com.hubEleven.common.model.BaseEntity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -65,7 +66,7 @@ public class SlackMessage extends BaseEntity {
 
 	public void markAsSent() {
 		this.status = SlackMessageStatus.SENT;
-		this.sentAt = LocalDateTime.now();
+		this.sentAt = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
 	}
 
 	public void markAsFailed() {
