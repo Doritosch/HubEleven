@@ -1,5 +1,6 @@
 package com.hubEleven.deliveryManager.domain;
 
+import com.hubEleven.common.model.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -14,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class DeliveryManager {
+public class DeliveryManager extends BaseEntity {
 
 	@Id private Long deliveryManagerId; // userId를 받아올 것임
 
@@ -57,5 +58,7 @@ public class DeliveryManager {
 	}
 
 	// 임시
-	public void softDelete(Long deletedBy) {}
+	public void softDelete(Long deletedBy) {
+        delete(deletedBy);
+    }
 }

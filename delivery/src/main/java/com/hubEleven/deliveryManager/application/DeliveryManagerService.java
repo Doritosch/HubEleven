@@ -1,5 +1,10 @@
 package com.hubEleven.deliveryManager.application;
 
+import static com.hubEleven.deliveryManager.domain.exception.DeliveryManagerErrorCode.COMPANY_DELIVERY_MANAGER_NOT_FOUND;
+import static com.hubEleven.deliveryManager.domain.exception.DeliveryManagerErrorCode.DELIVERY_MANAGER_NOF_FOUND;
+import static com.hubEleven.deliveryManager.domain.exception.DeliveryManagerErrorCode.HUB_DELIVERY_MANAGER_NOT_FOUND;
+
+import com.hubEleven.common.exception.GlobalException;
 import com.hubEleven.deliveryManager.domain.DeliveryManager;
 import com.hubEleven.deliveryManager.domain.DeliveryManagerRepository;
 import com.hubEleven.deliveryManager.domain.DeliveryType;
@@ -7,10 +12,11 @@ import com.hubEleven.deliveryManager.presentation.dto.request.DeliveryManagerAss
 import com.hubEleven.deliveryManager.presentation.dto.request.DeliveryManagerCreateRequestDto;
 import com.hubEleven.deliveryManager.presentation.dto.response.DeliveryManagerAssignResponseDto;
 import com.hubEleven.deliveryManager.presentation.dto.response.DeliveryManagerResponseDto;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -68,12 +74,12 @@ public class DeliveryManagerService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<DeliveryManagerResponseDto> getAllDeliveryManager() {
+	public Page<DeliveryManagerResponseDto> getAllDeliveryManager(Pageable pageable) {
 		/**
 		 * TODO: 검증사항 1. 조회 권한 검증(컨트롤러) 2. 세부 권한 검증(마스터는 전체조회 / 허브담당자는 본인허브 배달담당자만 조회 / 배달담당자는 본인만 조회)
 		 */
-		List<DeliveryManager> deliveryManager = deliveryManagerRepository.findAll();
-		return deliveryManager.stream().map(DeliveryManagerResponseDto::from).toList();
+        Page<DeliveryManager> deliveryManagerList = deliveryManagerRepository.findAll(pageable);
+        return deliveryManagerList.map(DeliveryManagerResponseDto::from);
 	}
 
 	@Transactional(readOnly = true)
@@ -84,16 +90,19 @@ public class DeliveryManagerService {
 		 */
 		Optional<DeliveryManager> deliveryManager = deliveryManagerRepository.findById(managerId);
 
-		return deliveryManager.map(DeliveryManagerResponseDto::from).orElse(null);
-	}
+		return deliveryManager
+                .map(DeliveryManagerResponseDto::from)
+                .orElseThrow(() -> new GlobalException(DELIVERY_MANAGER_NOF_FOUND));
 
-	@Transactional(readOnly = true)
+    }
+
+	@Transactional
 	public void deleteDeliveryManager(Long managerId) {
         //TODO: 삭제권한 검증
 		DeliveryManager deliveryManager =
 				deliveryManagerRepository
 						.findById(managerId)
-						.orElseThrow(() -> new IllegalArgumentException("해당 배송 담당자가 존재하지 않습니다."));
+                        .orElseThrow(() -> new GlobalException(DELIVERY_MANAGER_NOF_FOUND));
 
 		// 임시 데이터
 		Long deletedBy = 1L;
@@ -134,10 +143,10 @@ public class DeliveryManagerService {
 		return switch (deliveryType) {
 			case HUB -> deliveryManagerRepository
 					.findFirstByHubIdIsNullOrderByLastDeliveryTimeAscDeliveryOrderAsc()
-					.orElseThrow(() -> new IllegalArgumentException("허브 배송 담당자가 존재하지 않습니다."));
+                    .orElseThrow(() -> new GlobalException(HUB_DELIVERY_MANAGER_NOT_FOUND));
 			case COMPANY -> deliveryManagerRepository
 					.findFirstByHubIdOrderByLastDeliveryTimeAscDeliveryOrderAsc(hubId)
-					.orElseThrow(() -> new IllegalArgumentException("업체 배송담당자가 존재하지 않습니다."));
+                    .orElseThrow(() -> new GlobalException(COMPANY_DELIVERY_MANAGER_NOT_FOUND));
 		};
 	}
 }

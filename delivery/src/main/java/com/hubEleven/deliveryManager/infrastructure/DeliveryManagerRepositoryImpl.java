@@ -2,9 +2,10 @@ package com.hubEleven.deliveryManager.infrastructure;
 
 import com.hubEleven.deliveryManager.domain.DeliveryManager;
 import com.hubEleven.deliveryManager.domain.DeliveryManagerRepository;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -27,8 +28,8 @@ public class DeliveryManagerRepositoryImpl implements DeliveryManagerRepository 
 	}
 
 	@Override
-	public List<DeliveryManager> findAll() {
-		return deliveryManagerJpaRepository.findAll();
+	public Page<DeliveryManager> findAll(Pageable pageable) {
+		return deliveryManagerJpaRepository.findAll(pageable);
 	}
 
 	@Override

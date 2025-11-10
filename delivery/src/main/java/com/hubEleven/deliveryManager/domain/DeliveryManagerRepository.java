@@ -1,8 +1,9 @@
 package com.hubEleven.deliveryManager.domain;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface DeliveryManagerRepository {
 
@@ -10,7 +11,7 @@ public interface DeliveryManagerRepository {
 
 	Optional<DeliveryManager> findById(Long id);
 
-	List<DeliveryManager> findAll();
+	Page<DeliveryManager> findAll(Pageable pageable);
 
 	Integer findMaxDeliveryOrderByHubId(UUID hubId);
 
