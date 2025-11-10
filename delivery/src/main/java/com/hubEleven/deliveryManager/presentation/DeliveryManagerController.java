@@ -70,4 +70,7 @@ public class DeliveryManagerController {
 
 		return ResponseEntity.ok(assignResponseDtoList);
 	}
+
+    //deliveryManagerId로 배송담당자가 존재하는지 체크하는 메서드 -> 서치에서 필터링으로? /delivery-manager/exists?userId={userId}
+    //해당 업체배송담당자(deliveryType=COMPANY)가 특정허브에 속해있나/? delivery-manager/hub/{hubId}
 }

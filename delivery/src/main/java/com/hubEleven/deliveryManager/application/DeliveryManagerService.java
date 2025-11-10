@@ -89,6 +89,7 @@ public class DeliveryManagerService {
 
 	@Transactional(readOnly = true)
 	public void deleteDeliveryManager(Long managerId) {
+        //TODO: 삭제권한 검증
 		DeliveryManager deliveryManager =
 				deliveryManagerRepository
 						.findById(managerId)
@@ -103,6 +104,7 @@ public class DeliveryManagerService {
 	@Transactional
 	public DeliveryManagerAssignResponseDto assignDeliveryManagers(
 			DeliveryManagerAssignRequestDto assignRequestDto) {
+        //TODO: api 요청한 유저(로그인한 유저)가 마스터인가?
 
 		DeliveryType deliveryType = assignRequestDto.deliveryType();
 		UUID hubId = assignRequestDto.hubId();
