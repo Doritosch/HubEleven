@@ -17,6 +17,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 // TODO @AuthenticationPrincipal 권한로직
@@ -28,6 +29,7 @@ public class CompanyController {
 
 	private final CompanyAppService companyAppService;
 
+	@PreAuthorize("hasAnyRole('MASTER','HUB_MANAGER')")
 	@Operation(summary = "업체 생성 API", description = "새로운 업체를 생성한다.")
 	@PostMapping
 	public ResponseEntity<ApiResponse<CompanyResponse>> create(
@@ -36,6 +38,7 @@ public class CompanyController {
 		return ApiResponseEntity.success(CompanyResponse.from(dto));
 	}
 
+	@PreAuthorize("hasAnyRole('MASTER','HUB_MANAGER','COMPANY_MANAGER')")
 	@Operation(summary = "업체 수정 API", description = "업체의 기본 정보를 수정한다.")
 	@PatchMapping("/{companyId}")
 	public ResponseEntity<ApiResponse<CompanyResponse>> updateCompany(
@@ -44,6 +47,7 @@ public class CompanyController {
 		return ApiResponseEntity.success(CompanyResponse.from(dto));
 	}
 
+	@PreAuthorize("isAuthenticated()")
 	@Operation(summary = "업체 단건 조회 API", description = "업체 ID로 업체를 조회한다.")
 	@GetMapping("/{companyId}")
 	public ResponseEntity<ApiResponse<CompanyResponse>> getCompany(@PathVariable UUID companyId) {
@@ -51,6 +55,7 @@ public class CompanyController {
 		return ApiResponseEntity.success(CompanyResponse.from(dto));
 	}
 
+	@PreAuthorize("isAuthenticated()")
 	@Operation(summary = "업체 목록 조회 API", description = "업체 전체 목록을 조회한다.")
 	@GetMapping
 	public ResponseEntity<ApiResponse<CommonPageResponse<CompanyResponse>>> getCompanyList(
@@ -68,6 +73,7 @@ public class CompanyController {
 		return ApiResponseEntity.success(mapped);
 	}
 
+	@PreAuthorize("isAuthenticated()")
 	@Operation(summary = "업체 검색 API", description = "허브, 이름, 타입 등으로 업체를 검색한다.")
 	@GetMapping("/search")
 	public ResponseEntity<ApiResponse<CommonPageResponse<CompanyResponse>>> search(
@@ -96,6 +102,7 @@ public class CompanyController {
 		return ApiResponseEntity.success(mapped);
 	}
 
+	@PreAuthorize("hasAnyRole('MASTER','HUB_MANAGER','COMPANY_MANAGER')")
 	@Operation(summary = "업체 상태 변경 API", description = "업체의 상태를 변경한다.")
 	@PatchMapping("/{companyId}/status")
 	public ResponseEntity<ApiResponse<CompanyResponse>> updateCompanyStatus(
@@ -104,6 +111,7 @@ public class CompanyController {
 		return ApiResponseEntity.success(CompanyResponse.from(dto));
 	}
 
+	@PreAuthorize("hasAnyRole('MASTER','HUB_MANAGER')")
 	@Operation(summary = "업체 삭제 API", description = "업체를 삭제한다.")
 	@DeleteMapping("{companyId}")
 	public ResponseEntity<ApiResponse<Object>> deleteCompany(
