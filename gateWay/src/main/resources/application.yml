@@ -25,11 +25,20 @@ spring:
               predicates:
                 - Path=/v1/products/**
 
-            - id: hub-service
+            - id: hub-service-hubs
               uri: lb://hub-service
               predicates:
                 - Path=/v1/hubs/**
+
+            - id: hub-service-hub-routes
+              uri: lb://hub-service
+              predicates:
                 - Path=/v1/hub-routes/**
+
+            - id: hub-service-hub-routes-internal
+              uri: lb://hub-service
+              predicates:
+                - Path=/v1/internal/hub-routes/**
 
             - id: order-service
               uri: lb://order-service
