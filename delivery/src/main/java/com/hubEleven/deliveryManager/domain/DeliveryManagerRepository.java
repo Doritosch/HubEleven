@@ -20,4 +20,7 @@ public interface DeliveryManagerRepository {
 
 	// 회사 담당자용 (hubId 지정)
 	Optional<DeliveryManager> findFirstByHubIdOrderByLastDeliveryTimeAscDeliveryOrderAsc(UUID hubId);
+
+    boolean existsByHubIdAndDeliveryManagerId(UUID hubId, Long managerId);
+
 }

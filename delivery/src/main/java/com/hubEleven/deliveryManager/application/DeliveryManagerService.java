@@ -149,4 +149,13 @@ public class DeliveryManagerService {
                     .orElseThrow(() -> new GlobalException(COMPANY_DELIVERY_MANAGER_NOT_FOUND));
 		};
 	}
+
+
+    public boolean checkDeliveryManagerExists(Long managerId) {
+        return deliveryManagerRepository.findById(managerId).isPresent();
+    }
+
+    public boolean hasDeliveryManagerInHub(UUID hubId,  Long managerId) {
+        return deliveryManagerRepository.existsByHubIdAndDeliveryManagerId(hubId,managerId);
+    }
 }

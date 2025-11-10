@@ -50,4 +50,9 @@ public class DeliveryManagerRepositoryImpl implements DeliveryManagerRepository 
 		return deliveryManagerJpaRepository.findFirstByHubIdOrderByLastDeliveryTimeAscDeliveryOrderAsc(
 				hubId);
 	}
+
+    @Override
+    public boolean existsByHubIdAndDeliveryManagerId(UUID hubId, Long managerId) {
+        return deliveryManagerJpaRepository.existsByHubIdAndDeliveryManagerId(hubId,managerId);
+    }
 }

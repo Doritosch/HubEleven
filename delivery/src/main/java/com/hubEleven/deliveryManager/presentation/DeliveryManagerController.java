@@ -10,6 +10,7 @@ import com.hubEleven.deliveryManager.presentation.dto.request.DeliveryManagerCre
 import com.hubEleven.deliveryManager.presentation.dto.response.DeliveryManagerAssignResponseDto;
 import com.hubEleven.deliveryManager.presentation.dto.response.DeliveryManagerResponseDto;
 import jakarta.validation.Valid;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
@@ -89,7 +90,29 @@ public class DeliveryManagerController {
 		return ResponseEntity.ok(assignResponseDtoList);
 	}
 
-    // deliveryManagerId로 배송담당자가 존재하는지 체크하는 메서드 -> 서치에서 필터링으로?
-    // /delivery-manager/exists?userId={userId}
-    // 해당 업체배송담당자(deliveryType=COMPANY)가 특정허브에 속해있나/? delivery-manager/hub/{hubId}
+
+    //MSA 서버 내부용 메서드
+    @GetMapping("/exist")
+    public boolean checkDeliveryManagerExists(Long managerId) {
+        return deliveryManagerService.checkDeliveryManagerExists(managerId);
+
+    }
+
+    //MSA 서버 내부용 메서드
+    //업체배송담당 매니저 소속확인 - 해당허브에 해당매니저가 존재하는지 검증
+    @GetMapping("/exist/hub")
+    public boolean hasDeliveryManagerInHub(UUID hubId, Long managerId) {
+        return deliveryManagerService.hasDeliveryManagerInHub(hubId, managerId);
+
+    }
+
+//search
+//    public ResponseEntity<ApiResponse<CommonPageResponse<DeliveryManagerResponseDto>>> search(
+//        @RequestParam(defaultValue = "0") int page,
+//        @RequestParam(defaultValue = "10") int size,
+//        @RequestParam(defaultValue = "CREATED_AT") CommonPageRequest.SortType sortType,
+//        @RequestParam(defaultValue = "DESC") Sort.Direction direction,
+//        @RequestParam(required = false) String keyword ) {
+//    }
+
 }
