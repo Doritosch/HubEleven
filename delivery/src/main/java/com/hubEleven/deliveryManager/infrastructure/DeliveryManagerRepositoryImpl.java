@@ -2,6 +2,7 @@ package com.hubEleven.deliveryManager.infrastructure;
 
 import com.hubEleven.deliveryManager.domain.DeliveryManager;
 import com.hubEleven.deliveryManager.domain.DeliveryManagerRepository;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
@@ -28,7 +29,12 @@ public class DeliveryManagerRepositoryImpl implements DeliveryManagerRepository 
 		return deliveryManagerJpaRepository.findById(id);
 	}
 
-	@Override
+    @Override
+    public List<DeliveryManager> findAll() {
+        return deliveryManagerJpaRepository.findAll();
+    }
+
+    @Override
 	public Page<DeliveryManager> findAll(Pageable pageable) {
 		return deliveryManagerJpaRepository.findAll(pageable);
 	}
@@ -43,6 +49,11 @@ public class DeliveryManagerRepositoryImpl implements DeliveryManagerRepository 
     @Override
     public Page<DeliveryManager> findAllByHubId(UUID hubId, Pageable pageable) {
         return deliveryManagerJpaRepository.findAllByHubId(hubId, pageable);
+    }
+
+    @Override
+    public Optional<DeliveryManager> findByDeliveryManagerIdAndDeletedAtIsNotNull(Long id) {
+        return deliveryManagerJpaRepository.findByDeliveryManagerIdAndDeletedAtIsNotNull(id);
     }
 
 
@@ -68,5 +79,15 @@ public class DeliveryManagerRepositoryImpl implements DeliveryManagerRepository 
     @Override
     public boolean existsByHubIdAndDeliveryManagerId(UUID hubId, Long managerId) {
         return deliveryManagerJpaRepository.existsByHubIdAndDeliveryManagerId(hubId,managerId);
+    }
+
+    @Override
+    public Integer findLastDeliveryOrderByHubIdForUpdate(UUID hubId) {
+        return deliveryManagerJpaRepository.findLastDeliveryOrderByHubIdForUpdate(hubId);
+    }
+
+    @Override
+    public Integer findLastDeliveryOrderForNullHubForUpdate() {
+        return deliveryManagerJpaRepository.findLastDeliveryOrderByHubIdForUpdate(null);
     }
 }

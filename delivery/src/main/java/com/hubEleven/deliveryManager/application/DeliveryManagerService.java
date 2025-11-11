@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -40,56 +41,54 @@ public class DeliveryManagerService {
         this.hubService = hubService;
     }
 
-	// 배송 담당자 생성
-	@Transactional
-	public DeliveryManagerResponseDto createDeliveryManager(
-			DeliveryManagerCreateRequestDto createRequestDto) {
-		// plan : 요청 dto로 유저id만 받고, 유저서비스에서 id로 정보를 조회해 나머지 엔티티 필드 채우기(hubID, slackId, DeliveryType,
-		// deliveryOrder(배송순번))
-        /**
-         * TODO : 1. 생성 권한이 있는지 확인하기 (로그인한 유저가 마스터 혹은 허브관리자인가?) -> 컨트롤러에서 2. RequestDto에서 id 꺼내와
-         * FeignClient로 User-Service 서버에서 user정보 받아오기 (user정보에 id, slackId, 권한, 소속업체(허브)ID 존재) 3. 위에서
-         * 받아온 user정보에서 id 존재 여부 조회 후, role이 배송담당자인지 확인, 3-2 소속업체 id가 NULL이면 허브배송 담당자, NULL이 아니면
-         * 업체담당자(소속업체 id가 허브id가 맞는지도 검증해야 할까?)
-         */
-        log.info("[Delivery Manager Service] create: 배달 담당자 생성 요청");
-		// 임시 데이터----------------------------
-		Long id = createRequestDto.deliveryManagerId();
-		UUID hubId = null; // UUID.fromString("1524dc79-9ed1-460b-a85f-521f0d8a28aa"); //null;
-		// //UUID.fromString("9090dc79-9ed1-460b-a85f-521f0d8a28aa"); // UUID.randomUUID();
-		String slackId = "slack001";
-		DeliveryType deliveryType = DeliveryType.HUB;
+    @Transactional
+    public DeliveryManagerResponseDto createDeliveryManager(
+        DeliveryManagerCreateRequestDto createRequestDto) {
 
-        log.info("[Delivery Manager Service] create: 배송타입 : {}", deliveryType);
-		// ----------------------------------
+        Long id = createRequestDto.deliveryManagerId();
+        UUID hubId = UUID.fromString("97eb5e60-beee-11f0-adaf-c6cdb3175b81");
+        String slackId = "slack001";
+        DeliveryType deliveryType = DeliveryType.COMPANY;
 
-        // hubID 존재여부 검증
-        if (deliveryType == DeliveryType.COMPANY) {
-            HubResponseDto hubResponseDto = hubService.getHub(hubId);
-            log.info(
-                "[Delivery Manager Service] create:허브 정보 확인 : {}, {}",
-                hubResponseDto.hubId(),
-                hubResponseDto.name());
+        if (checkDeliveryManagerExists(id)) {
+            throw new GlobalException(DeliveryManagerErrorCode.DUPLICATE_DELIVERY_MANAGER);
         }
 
-        // DB에 이미 존재하는 id 인지 확인
-        if (checkDeliveryManagerExists(id))
-            throw new GlobalException(DeliveryManagerErrorCode.DUPLICATE_DELIVERY_MANAGER);
+        int retryCount = 0;
+        final int maxRetry = 5;
+        while (true) {
+            try {
 
-		// 배송순번 부여
-		int deliveryOrder = setDeliveryOrder(deliveryType, hubId);
+                Integer last = null;
+                if (hubId == null) {
+                    last = deliveryManagerRepository.findLastDeliveryOrderForNullHubForUpdate();
+                } else {
+                    last = deliveryManagerRepository.findLastDeliveryOrderByHubIdForUpdate(hubId);
+                }
 
-		DeliveryManager deliveryManager =
-				DeliveryManager.create(id, hubId, slackId, deliveryType, deliveryOrder);
+                int nextOrder = (last == null) ? 1 : last + 1;
 
-		deliveryManagerRepository.save(deliveryManager);
+                DeliveryManager deliveryManager =
+                    DeliveryManager.create(id, hubId, slackId, deliveryType, nextOrder);
 
-        log.info("[Delivery Manager Service] create: 배달 담당자 생성 - DB 저장 성공");
+                deliveryManagerRepository.save(deliveryManager);
 
-		DeliveryManagerResponseDto responseDto = DeliveryManagerResponseDto.from(deliveryManager);
+                return DeliveryManagerResponseDto.from(deliveryManager);
+            } catch (DataIntegrityViolationException ex) {
+                // 유니크 충돌 발생 시 재시도 (다른 트랜잭션이 먼저 삽입했을 수 있음)
+                if (++retryCount > maxRetry) {
+                    throw new GlobalException(DeliveryManagerErrorCode.DUPLICATE_DELIVERY_MANAGER);
+                }
+                log.warn("[createDeliveryManager] 순번 충돌 발생, 재시도 {}/{}", retryCount, maxRetry);
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException ignored) {
+                }
+                // 재시도: 같은 트랜잭션으로는 안되고, 루프가 계속되며 다음 반복에서 새 트랜잭션으로 다시 시도됨
+            }
+        }
+    }
 
-		return responseDto;
-	}
 
 	@Transactional(readOnly = true)
 	public Page<DeliveryManagerResponseDto> getAllDeliveryManager(Pageable pageable) {
@@ -133,6 +132,12 @@ public class DeliveryManagerService {
 				deliveryManagerRepository
 						.findById(managerId)
                         .orElseThrow(() -> new GlobalException(DELIVERY_MANAGER_NOT_FOUND));
+
+
+        //이미삭제된 데이터먼 에러발생
+        if(deliveryManagerRepository.findByDeliveryManagerIdAndDeletedAtIsNotNull(managerId).isPresent()) {
+            throw new GlobalException(DELIVERY_MANAGER_NOT_FOUND);
+        }
 
 		// 임시 데이터
 		Long deletedBy = 1L;

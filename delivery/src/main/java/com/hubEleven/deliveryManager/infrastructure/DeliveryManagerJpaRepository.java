@@ -13,7 +13,9 @@ import org.springframework.data.repository.query.Param;
 public interface DeliveryManagerJpaRepository extends JpaRepository<DeliveryManager, Long>,
     JpaSpecificationExecutor<DeliveryManager> {
 
-	@Query(
+    Optional<DeliveryManager> findByDeliveryManagerIdAndDeletedAtIsNotNull(Long id);
+
+    @Query(
 			"""
 		SELECT MAX(dm.deliveryOrder)
 		FROM DeliveryManager dm
@@ -31,5 +33,27 @@ public interface DeliveryManagerJpaRepository extends JpaRepository<DeliveryMana
     boolean existsByHubIdAndDeliveryManagerId(UUID hubId, Long managerId);
 
     Page<DeliveryManager> findAllByHubId(UUID hubId, Pageable pageable);
+
+    // hubId NOT NULL 일 때: 마지막 delivery_order 를 FOR UPDATE로 잠근다.
+    @Query(value = """
+        SELECT delivery_order
+        FROM delivery_manager
+        WHERE hub_id = :hubId
+        ORDER BY delivery_order DESC
+        LIMIT 1
+        FOR UPDATE
+        """, nativeQuery = true)
+    Integer findLastDeliveryOrderByHubIdForUpdate(@Param("hubId") UUID hubId);
+
+    // hubId IS NULL 일 때
+    @Query(value = """
+        SELECT delivery_order
+        FROM delivery_manager
+        WHERE hub_id IS NULL
+        ORDER BY delivery_order DESC
+        LIMIT 1
+        FOR UPDATE
+        """, nativeQuery = true)
+    Integer findLastDeliveryOrderForNullHubForUpdate();
 
 }
