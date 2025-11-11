@@ -2,13 +2,12 @@ package com.hubEleven.company.application.service;
 
 import static com.hubEleven.company.domain.exception.CompanyErrorCode.*;
 
-import com.hubEleven.common.code.ErrorCode;
-import com.hubEleven.common.exception.GlobalException;
-import com.hubEleven.common.request.CommonPageRequest;
-import com.hubEleven.common.response.CommonPageResponse;
-import com.hubEleven.common.utils.PagingUtils;
+import com.commonLib.common.code.ErrorCode;
+import com.commonLib.common.exception.GlobalException;
+import com.commonLib.common.request.CommonPageRequest;
+import com.commonLib.common.response.CommonPageResponse;
+import com.commonLib.common.utils.PagingUtils;
 import com.hubEleven.company.application.dto.CompanyDTO;
-import com.hubEleven.company.domain.exception.CompanyErrorCode;
 import com.hubEleven.company.domain.model.Company;
 import com.hubEleven.company.domain.model.CompanyStatus;
 import com.hubEleven.company.domain.model.CompanyType;
@@ -33,9 +32,9 @@ public class CompanyAppService {
 		try {
 			hubClient.getHub(hubId);
 		} catch (feign.FeignException.NotFound e) {
-			throw new GlobalException(CompanyErrorCode.HUB_NOT_FOUND);
+			throw new GlobalException(HUB_NOT_FOUND);
 		} catch (feign.FeignException e) {
-			throw new com.hubEleven.common.exception.GlobalException(ErrorCode.SERVER_ERROR);
+			throw new GlobalException(ErrorCode.SERVER_ERROR);
 		}
 	}
 
@@ -106,13 +105,13 @@ public class CompanyAppService {
 		var company =
 				companyRepository
 						.findById(companyId)
-						.orElseThrow(() -> new GlobalException(COMPANY_NOT_FOUND));
+						.orElseThrow(() -> new GlobalException(COMPANY_DUPLICATED));
 
 		CompanyStatus newStatus;
 		try {
 			newStatus = CompanyStatus.valueOf(rawStatus.toUpperCase());
 		} catch (IllegalArgumentException e) {
-			throw new com.hubEleven.common.exception.GlobalException(ErrorCode.VALIDATION_ERROR);
+			throw new GlobalException(ErrorCode.SERVER_ERROR);
 		}
 		company.changeStatus(newStatus);
 		return CompanyDTO.from(company);
@@ -123,7 +122,7 @@ public class CompanyAppService {
 		var company =
 				companyRepository
 						.findById(companyId)
-						.orElseThrow(() -> new GlobalException(CompanyErrorCode.COMPANY_NOT_FOUND));
+						.orElseThrow(() -> new GlobalException(COMPANY_NOT_FOUND));
 		company.delete(deleterId);
 	}
 }

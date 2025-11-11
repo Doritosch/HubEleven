@@ -1,9 +1,9 @@
 package com.hubEleven.company.presentation.controller;
 
-import com.hubEleven.common.request.CommonPageRequest;
-import com.hubEleven.common.response.ApiResponse;
-import com.hubEleven.common.response.ApiResponseEntity;
-import com.hubEleven.common.response.CommonPageResponse;
+import com.commonLib.common.request.CommonPageRequest;
+import com.commonLib.common.response.ApiResponse;
+import com.commonLib.common.response.ApiResponseEntity;
+import com.commonLib.common.response.CommonPageResponse;
 import com.hubEleven.company.application.dto.CompanyDTO;
 import com.hubEleven.company.application.service.CompanyAppService;
 import com.hubEleven.company.domain.model.CompanyStatus;
