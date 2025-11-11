@@ -105,7 +105,7 @@ public class CompanyAppService {
 		var company =
 				companyRepository
 						.findById(companyId)
-						.orElseThrow(() -> new GlobalException(COMPANY_DUPLICATED));
+						.orElseThrow(() -> new GlobalException(COMPANY_NOT_FOUND));
 
 		CompanyStatus newStatus;
 		try {

@@ -20,7 +20,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-// TODO @AuthenticationPrincipal 권한로직
 @Tag(name = "Company", description = "업체 API")
 @RestController
 @RequiredArgsConstructor

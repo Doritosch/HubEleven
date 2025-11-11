@@ -1,7 +1,9 @@
 package com.hubEleven.company.domain.model;
 
+import com.commonLib.common.exception.GlobalException;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import static com.hubEleven.company.domain.exception.CompanyErrorCode.COMPANY_NOT_FOUND;
 
 public enum CompanyType {
 	PRODUCER("생산업체"),
@@ -25,6 +27,6 @@ public enum CompanyType {
 				return type;
 			}
 		}
-		throw new IllegalArgumentException("지원하지 않는 업체입니다.");
+		throw new GlobalException(COMPANY_NOT_FOUND);
 	}
 }
