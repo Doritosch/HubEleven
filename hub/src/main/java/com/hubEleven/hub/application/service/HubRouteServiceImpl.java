@@ -1,6 +1,6 @@
 package com.hubEleven.hub.application.service;
 
-import com.hubEleven.common.exception.GlobalException;
+import com.commonLib.common.exception.GlobalException;
 import com.hubEleven.hub.application.dto.RouteResult;
 import com.hubEleven.hub.application.util.RouteCalculationResult;
 import com.hubEleven.hub.application.util.RouteCalculator;
@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class RouteServiceImpl implements RouteService {
+public class HubRouteServiceImpl implements HubRouteService {
 
 	private final HubRepository hubRepository;
 	private final HubRouteRepository hubRouteRepository;
