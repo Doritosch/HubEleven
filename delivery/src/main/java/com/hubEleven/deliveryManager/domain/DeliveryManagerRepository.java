@@ -30,10 +30,12 @@ public interface DeliveryManagerRepository {
     Integer findMaxDeliveryOrderByHubId(UUID hubId);
 
 	// 허브 담당자용 (hubId가 null인 경우)
-	Optional<DeliveryManager> findFirstByHubIdIsNullOrderByLastDeliveryTimeAscDeliveryOrderAsc();
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    Optional<DeliveryManager> findFirstByHubIdIsNullOrderByLastDeliveryTimeAscDeliveryOrderAsc();
 
-	// 회사 담당자용 (hubId 지정)
-	Optional<DeliveryManager> findFirstByHubIdOrderByLastDeliveryTimeAscDeliveryOrderAsc(UUID hubId);
+	// 업체 담당자용 (hubId 지정)
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    Optional<DeliveryManager> findFirstByHubIdOrderByLastDeliveryTimeAscDeliveryOrderAsc(UUID hubId);
 
     boolean existsByHubIdAndDeliveryManagerId(UUID hubId, Long managerId);
     Integer findLastDeliveryOrderByHubIdForUpdate(@Param("hubId") UUID hubId);
