@@ -1,13 +1,11 @@
 package com.hubEleven.notification.slack.application.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hubEleven.common.exception.GlobalException;
-import com.hubEleven.common.request.CommonPageRequest;
-import com.hubEleven.common.response.CommonPageResponse;
-import com.hubEleven.common.utils.PagingUtils;
-import com.hubEleven.notification.ai.application.dto.MessageGenerationRequest;
+import com.commonLib.common.exception.GlobalException;
+import com.commonLib.common.request.CommonPageRequest;
+import com.commonLib.common.response.CommonPageResponse;
+import com.commonLib.common.utils.PagingUtils;
 import com.hubEleven.notification.ai.application.dto.MessageGenerationResponse;
-import com.hubEleven.notification.ai.application.service.AiAppService;
 import com.hubEleven.notification.ai.domain.exception.NotificationErrorCode;
 import com.hubEleven.notification.ai.domain.repository.AiRequestLogRepository;
 import com.hubEleven.notification.slack.application.dto.SlackMessageCreateRequest;

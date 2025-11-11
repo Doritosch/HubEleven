@@ -1,6 +1,6 @@
 package com.hubEleven.notification.ai.infrastructure.client;
 
-import com.hubEleven.common.exception.GlobalException;
+import com.commonLib.common.exception.GlobalException;
 import com.hubEleven.notification.ai.domain.exception.NotificationErrorCode;
 import com.hubEleven.notification.ai.infrastructure.client.dto.GeminiRequest;
 import com.hubEleven.notification.ai.infrastructure.client.dto.GeminiResponse;

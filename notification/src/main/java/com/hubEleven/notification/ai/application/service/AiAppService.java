@@ -2,7 +2,7 @@ package com.hubEleven.notification.ai.application.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hubEleven.common.exception.GlobalException;
+import com.commonLib.common.exception.GlobalException;
 import com.hubEleven.notification.ai.application.dto.MessageGenerationRequest;
 import com.hubEleven.notification.ai.application.dto.MessageGenerationResponse;
 import com.hubEleven.notification.ai.domain.exception.NotificationErrorCode;
