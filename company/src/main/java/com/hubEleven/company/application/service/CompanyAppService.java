@@ -36,7 +36,6 @@ public class CompanyAppService {
 		return AuthUserContext.get();
 	}
 
-	// ✅ 중복 선언 제거 - 이 메서드만 남깁니다.
 	private void assertHubExists(UUID hubId) {
 		try {
 			hubClient.getHub(hubId);
