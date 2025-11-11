@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public enum DeliveryManagerErrorCode implements StatusCode {
-    DELIVERY_MANAGER_NOF_FOUND(HttpStatus.NOT_FOUND, "배송 담당자를 찾을 수 없습니다."),
+    DELIVERY_MANAGER_NOT_FOUND(HttpStatus.NOT_FOUND, "배송 담당자를 찾을 수 없습니다."),
     HUB_DELIVERY_MANAGER_NOT_FOUND(HttpStatus.NOT_FOUND, "허브 배송 담당자가 존재하지 않습니다."),
     COMPANY_DELIVERY_MANAGER_NOT_FOUND(HttpStatus.NOT_FOUND, "업체 배송 담당자가 존재하지 않습니다."),
     DUPLICATE_DELIVERY_MANAGER(HttpStatus.CONFLICT, "이미 존재하는 배송 담당자입니다."),

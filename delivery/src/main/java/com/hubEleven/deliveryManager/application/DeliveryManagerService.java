@@ -1,7 +1,7 @@
 package com.hubEleven.deliveryManager.application;
 
 import static com.hubEleven.deliveryManager.domain.exception.DeliveryManagerErrorCode.COMPANY_DELIVERY_MANAGER_NOT_FOUND;
-import static com.hubEleven.deliveryManager.domain.exception.DeliveryManagerErrorCode.DELIVERY_MANAGER_NOF_FOUND;
+import static com.hubEleven.deliveryManager.domain.exception.DeliveryManagerErrorCode.DELIVERY_MANAGER_NOT_FOUND;
 import static com.hubEleven.deliveryManager.domain.exception.DeliveryManagerErrorCode.HUB_DELIVERY_MANAGER_NOT_FOUND;
 
 import com.commonLib.common.exception.GlobalException;
@@ -122,7 +122,7 @@ public class DeliveryManagerService {
 
         return deliveryManager
                 .map(DeliveryManagerResponseDto::from)
-                .orElseThrow(() -> new GlobalException(DELIVERY_MANAGER_NOF_FOUND));
+                .orElseThrow(() -> new GlobalException(DELIVERY_MANAGER_NOT_FOUND));
 
     }
 
@@ -132,7 +132,7 @@ public class DeliveryManagerService {
 		DeliveryManager deliveryManager =
 				deliveryManagerRepository
 						.findById(managerId)
-                        .orElseThrow(() -> new GlobalException(DELIVERY_MANAGER_NOF_FOUND));
+                        .orElseThrow(() -> new GlobalException(DELIVERY_MANAGER_NOT_FOUND));
 
 		// 임시 데이터
 		Long deletedBy = 1L;
