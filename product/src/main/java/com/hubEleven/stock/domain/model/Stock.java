@@ -34,22 +34,34 @@ public class Stock extends BaseEntity {
 	private UUID companyId;
 
 	@Column(name = "quantity", nullable = false)
-	private Integer quantity;
+	private Long quantity;
 
 	@Builder(access = AccessLevel.PRIVATE)
-	private Stock(Integer quantity, UUID productId, UUID companyId, UUID hubId) {
+	private Stock(Long quantity, UUID productId, UUID companyId, UUID hubId) {
 		this.quantity = quantity;
 		this.productId = productId;
 		this.companyId = companyId;
 		this.hubId = hubId;
 	}
 
-	public static Stock create(Integer quantity, UUID productId, UUID companyId, UUID hubId) {
+	public static Stock create(Long quantity, UUID productId, UUID companyId, UUID hubId) {
 		return Stock.builder()
 				.quantity(quantity)
 				.productId(productId)
 				.companyId(companyId)
 				.hubId(hubId)
 				.build();
+	}
+
+	public void decreaseQuantity(Long decreaseQuantity) {
+		if (decreaseQuantity != null && decreaseQuantity > 0 && this.quantity >= decreaseQuantity) {
+			this.quantity -= decreaseQuantity;
+		}
+	}
+
+	public void restoreQuantity(Long restoreQuantity) {
+		if (restoreQuantity != null && restoreQuantity > 0) {
+			this.quantity += restoreQuantity;
+		}
 	}
 }

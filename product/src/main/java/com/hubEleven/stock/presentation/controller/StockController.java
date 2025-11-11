@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,6 +39,26 @@ public class StockController {
 	public ResponseEntity<ApiResponse<StockResponse>> getStock(@PathVariable UUID productId) {
 
 		StockResult result = stockService.getStockByProductId(productId);
+
+		return ApiResponseEntity.success(StockResponse.from(result));
+	}
+
+	@PutMapping
+	public ResponseEntity<ApiResponse<StockResponse>> decreaseStock(
+			@Valid @RequestBody StockRequests.Decrease request) {
+
+		// 재고 감소 로직 호출
+		StockResult result = stockService.decreaseStock(request);
+
+		return ApiResponseEntity.success(StockResponse.from(result));
+	}
+
+	@PutMapping("/restore")
+	public ResponseEntity<ApiResponse<StockResponse>> restoreStock(
+			@Valid @RequestBody StockRequests.Restore request) {
+
+		// 재고 복원 로직 호출
+		StockResult result = stockService.restoreStock(request);
 
 		return ApiResponseEntity.success(StockResponse.from(result));
 	}
