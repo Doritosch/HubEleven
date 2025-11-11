@@ -1,6 +1,7 @@
 package com.hubEleven.company.domain.model;
 
 import static com.hubEleven.company.domain.exception.CompanyErrorCode.COMPANY_NOT_FOUND;
+
 import com.commonLib.common.exception.GlobalException;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;

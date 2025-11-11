@@ -17,7 +17,6 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Company", description = "업체 API")
@@ -56,14 +55,15 @@ public class CompanyController {
 	public ResponseEntity<ApiResponse<CommonPageResponse<CompanyResponse>>> getCompanyList(
 			@Valid CommonPageRequest pageReq) {
 		var page = companyAppService.findCompanyList(pageReq);
-		var mapped = new CommonPageResponse<>(
-				page.content().stream().map(CompanyResponse::from).toList(),
-				page.page(),
-				page.size(),
-				page.totalElements(),
-				page.totalPages(),
-				page.first(),
-				page.last());
+		var mapped =
+				new CommonPageResponse<>(
+						page.content().stream().map(CompanyResponse::from).toList(),
+						page.page(),
+						page.size(),
+						page.totalElements(),
+						page.totalPages(),
+						page.first(),
+						page.last());
 		return ApiResponseEntity.success(mapped);
 	}
 
@@ -76,21 +76,23 @@ public class CompanyController {
 			@RequestParam(required = false) CompanyType type,
 			@RequestParam(required = false) CompanyStatus status) {
 
-		var page = companyAppService.searchCompany(
-				Optional.ofNullable(hubId),
-				Optional.ofNullable(name),
-				Optional.ofNullable(type),
-				Optional.ofNullable(status),
-				pageReq);
+		var page =
+				companyAppService.searchCompany(
+						Optional.ofNullable(hubId),
+						Optional.ofNullable(name),
+						Optional.ofNullable(type),
+						Optional.ofNullable(status),
+						pageReq);
 
-		var mapped = new CommonPageResponse<>(
-				page.content().stream().map(CompanyResponse::from).toList(),
-				page.page(),
-				page.size(),
-				page.totalElements(),
-				page.totalPages(),
-				page.first(),
-				page.last());
+		var mapped =
+				new CommonPageResponse<>(
+						page.content().stream().map(CompanyResponse::from).toList(),
+						page.page(),
+						page.size(),
+						page.totalElements(),
+						page.totalPages(),
+						page.first(),
+						page.last());
 		return ApiResponseEntity.success(mapped);
 	}
 

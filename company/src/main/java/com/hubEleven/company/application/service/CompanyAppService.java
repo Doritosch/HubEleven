@@ -63,7 +63,9 @@ public class CompanyAppService {
 
 		if (user.role() == Role.MASTER) return;
 		if (user.role() == Role.HUB_MANAGER && hubId != null && hubId.equals(user.hubId())) return;
-		if (user.role() == Role.COMPANY_MANAGER && companyId != null && companyId.equals(user.companyId())) return;
+		if (user.role() == Role.COMPANY_MANAGER
+				&& companyId != null
+				&& companyId.equals(user.companyId())) return;
 
 		throw new GlobalException(CompanyErrorCode.FORBIDDEN);
 	}
@@ -87,14 +89,17 @@ public class CompanyAppService {
 			throw new GlobalException(COMPANY_DUPLICATED);
 		}
 
-		Company company = Company.create(req.hubId(), req.name(), req.type(), req.slackId(), req.address());
+		Company company =
+				Company.create(req.hubId(), req.name(), req.type(), req.slackId(), req.address());
 		return CompanyDTO.from(companyRepository.save(company));
 	}
 
 	@Transactional
 	public CompanyDTO updateCompany(UUID companyId, CompanyRequests.Update req) {
-		var company = companyRepository.findById(companyId)
-				.orElseThrow(() -> new GlobalException(COMPANY_NOT_FOUND));
+		var company =
+				companyRepository
+						.findById(companyId)
+						.orElseThrow(() -> new GlobalException(COMPANY_NOT_FOUND));
 
 		assertUpdateAccess(company.getHubId(), company.getCompanyId());
 		assertHubExists(company.getHubId());
@@ -113,15 +118,18 @@ public class CompanyAppService {
 
 	@Transactional(readOnly = true)
 	public CompanyDTO getCompany(UUID companyId) {
-		var company = companyRepository.findById(companyId)
-				.orElseThrow(() -> new GlobalException(COMPANY_NOT_FOUND));
+		var company =
+				companyRepository
+						.findById(companyId)
+						.orElseThrow(() -> new GlobalException(COMPANY_NOT_FOUND));
 		return CompanyDTO.from(company);
 	}
 
 	@Transactional(readOnly = true)
 	public CommonPageResponse<CompanyDTO> findCompanyList(CommonPageRequest pageReq) {
-		var page = companyRepository.search(
-				new CompanySearchCondition(null, null, null, null), pageReq.toPageable());
+		var page =
+				companyRepository.search(
+						new CompanySearchCondition(null, null, null, null), pageReq.toPageable());
 		return PagingUtils.convert(page, CompanyDTO::from);
 	}
 
@@ -133,16 +141,19 @@ public class CompanyAppService {
 			Optional<CompanyStatus> status,
 			CommonPageRequest pageReq) {
 
-		var cond = new CompanySearchCondition(
-				hubId.orElse(null), name.orElse(null), type.orElse(null), status.orElse(null));
+		var cond =
+				new CompanySearchCondition(
+						hubId.orElse(null), name.orElse(null), type.orElse(null), status.orElse(null));
 		var page = companyRepository.search(cond, pageReq.toPageable());
 		return PagingUtils.convert(page, CompanyDTO::from);
 	}
 
 	@Transactional
 	public CompanyDTO changeStatus(UUID companyId, String rawStatus) {
-		var company = companyRepository.findById(companyId)
-				.orElseThrow(() -> new GlobalException(COMPANY_NOT_FOUND));
+		var company =
+				companyRepository
+						.findById(companyId)
+						.orElseThrow(() -> new GlobalException(COMPANY_NOT_FOUND));
 
 		assertUpdateAccess(company.getHubId(), company.getCompanyId());
 
@@ -159,8 +170,10 @@ public class CompanyAppService {
 
 	@Transactional
 	public void deleteCompany(UUID companyId) {
-		var company = companyRepository.findById(companyId)
-				.orElseThrow(() -> new GlobalException(COMPANY_NOT_FOUND));
+		var company =
+				companyRepository
+						.findById(companyId)
+						.orElseThrow(() -> new GlobalException(COMPANY_NOT_FOUND));
 
 		assertDeleteAccess(company.getHubId());
 

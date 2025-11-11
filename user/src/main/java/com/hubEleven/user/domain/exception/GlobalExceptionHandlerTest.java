@@ -4,5 +4,4 @@ import com.commonLib.common.exception.GlobalExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class GlobalExceptionHandlerTest extends GlobalExceptionHandler {
-}
+public class GlobalExceptionHandlerTest extends GlobalExceptionHandler {}
