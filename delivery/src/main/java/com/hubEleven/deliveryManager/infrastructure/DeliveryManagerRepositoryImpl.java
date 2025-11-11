@@ -29,35 +29,33 @@ public class DeliveryManagerRepositoryImpl implements DeliveryManagerRepository 
 		return deliveryManagerJpaRepository.findById(id);
 	}
 
-    @Override
-    public List<DeliveryManager> findAll() {
-        return deliveryManagerJpaRepository.findAll();
-    }
+	@Override
+	public List<DeliveryManager> findAll() {
+		return deliveryManagerJpaRepository.findAll();
+	}
 
-    @Override
+	@Override
 	public Page<DeliveryManager> findAll(Pageable pageable) {
 		return deliveryManagerJpaRepository.findAll(pageable);
 	}
 
-    // ✅ Specification 기반 조회 위임
-    @Override
-    public Page<DeliveryManager> findAll(Specification<DeliveryManager> spec, Pageable pageable) {
-        return deliveryManagerJpaRepository.findAll(spec, pageable);
-    }
+	// ✅ Specification 기반 조회 위임
+	@Override
+	public Page<DeliveryManager> findAll(Specification<DeliveryManager> spec, Pageable pageable) {
+		return deliveryManagerJpaRepository.findAll(spec, pageable);
+	}
 
+	@Override
+	public Page<DeliveryManager> findAllByHubId(UUID hubId, Pageable pageable) {
+		return deliveryManagerJpaRepository.findAllByHubId(hubId, pageable);
+	}
 
-    @Override
-    public Page<DeliveryManager> findAllByHubId(UUID hubId, Pageable pageable) {
-        return deliveryManagerJpaRepository.findAllByHubId(hubId, pageable);
-    }
+	@Override
+	public Optional<DeliveryManager> findByDeliveryManagerIdAndDeletedAtIsNotNull(Long id) {
+		return deliveryManagerJpaRepository.findByDeliveryManagerIdAndDeletedAtIsNotNull(id);
+	}
 
-    @Override
-    public Optional<DeliveryManager> findByDeliveryManagerIdAndDeletedAtIsNotNull(Long id) {
-        return deliveryManagerJpaRepository.findByDeliveryManagerIdAndDeletedAtIsNotNull(id);
-    }
-
-
-    @Override
+	@Override
 	public Integer findMaxDeliveryOrderByHubId(UUID hubId) {
 		return deliveryManagerJpaRepository.findMaxDeliveryOrderByHubId(hubId);
 	}
@@ -76,18 +74,18 @@ public class DeliveryManagerRepositoryImpl implements DeliveryManagerRepository 
 				hubId);
 	}
 
-    @Override
-    public boolean existsByHubIdAndDeliveryManagerId(UUID hubId, Long managerId) {
-        return deliveryManagerJpaRepository.existsByHubIdAndDeliveryManagerId(hubId,managerId);
-    }
+	@Override
+	public boolean existsByHubIdAndDeliveryManagerId(UUID hubId, Long managerId) {
+		return deliveryManagerJpaRepository.existsByHubIdAndDeliveryManagerId(hubId, managerId);
+	}
 
-    @Override
-    public Integer findLastDeliveryOrderByHubIdForUpdate(UUID hubId) {
-        return deliveryManagerJpaRepository.findLastDeliveryOrderByHubIdForUpdate(hubId);
-    }
+	@Override
+	public Integer findLastDeliveryOrderByHubIdForUpdate(UUID hubId) {
+		return deliveryManagerJpaRepository.findLastDeliveryOrderByHubIdForUpdate(hubId);
+	}
 
-    @Override
-    public Integer findLastDeliveryOrderForNullHubForUpdate() {
-        return deliveryManagerJpaRepository.findLastDeliveryOrderByHubIdForUpdate(null);
-    }
+	@Override
+	public Integer findLastDeliveryOrderForNullHubForUpdate() {
+		return deliveryManagerJpaRepository.findLastDeliveryOrderByHubIdForUpdate(null);
+	}
 }

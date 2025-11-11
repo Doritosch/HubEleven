@@ -16,11 +16,10 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(
-    name = "delivery_manager",
-    uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"hub_id", "delivery_type", "delivery_order"})
-    }
-)
+		name = "delivery_manager",
+		uniqueConstraints = {
+			@UniqueConstraint(columnNames = {"hub_id", "delivery_type", "delivery_order"})
+		})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class DeliveryManager extends BaseEntity {
@@ -67,6 +66,6 @@ public class DeliveryManager extends BaseEntity {
 
 	// 임시
 	public void softDelete(Long deletedBy) {
-        delete(deletedBy);
-    }
+		delete(deletedBy);
+	}
 }

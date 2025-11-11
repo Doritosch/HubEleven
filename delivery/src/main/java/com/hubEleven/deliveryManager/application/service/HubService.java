@@ -11,19 +11,19 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class HubService {
-    private final HubFeignClient hubFeignClient;
+	private final HubFeignClient hubFeignClient;
 
-    public HubService(HubFeignClient hubFeignClient) {
-        this.hubFeignClient = hubFeignClient;
-    }
+	public HubService(HubFeignClient hubFeignClient) {
+		this.hubFeignClient = hubFeignClient;
+	}
 
-    public HubResponseDto getHub(UUID hubId) {
-        try {
-            return hubFeignClient.getHub(hubId);
-        } catch (Exception e) {
-            // 로깅, 예외 변환 등
-            log.info("잘못된 허브 ID");
-            throw new GlobalException(DeliveryManagerErrorCode.HUB_NOR_FOUND);
-        }
-    }
+	public HubResponseDto getHub(UUID hubId) {
+		try {
+			return hubFeignClient.getHub(hubId);
+		} catch (Exception e) {
+			// 로깅, 예외 변환 등
+			log.info("잘못된 허브 ID");
+			throw new GlobalException(DeliveryManagerErrorCode.HUB_NOR_FOUND);
+		}
+	}
 }

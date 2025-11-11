@@ -16,29 +16,30 @@ public interface DeliveryManagerRepository {
 
 	Optional<DeliveryManager> findById(Long id);
 
-    List<DeliveryManager> findAll();
+	List<DeliveryManager> findAll();
 
 	Page<DeliveryManager> findAll(Pageable pageable);
 
-    Page<DeliveryManager> findAll(Specification<DeliveryManager> spec, Pageable pageable);
+	Page<DeliveryManager> findAll(Specification<DeliveryManager> spec, Pageable pageable);
 
-    Page<DeliveryManager> findAllByHubId(UUID hubId, Pageable pageable);
+	Page<DeliveryManager> findAllByHubId(UUID hubId, Pageable pageable);
 
-    Optional<DeliveryManager> findByDeliveryManagerIdAndDeletedAtIsNotNull(Long id);
+	Optional<DeliveryManager> findByDeliveryManagerIdAndDeletedAtIsNotNull(Long id);
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    Integer findMaxDeliveryOrderByHubId(UUID hubId);
+	@Lock(LockModeType.PESSIMISTIC_WRITE)
+	Integer findMaxDeliveryOrderByHubId(UUID hubId);
 
 	// 허브 담당자용 (hubId가 null인 경우)
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    Optional<DeliveryManager> findFirstByHubIdIsNullOrderByLastDeliveryTimeAscDeliveryOrderAsc();
+	@Lock(LockModeType.PESSIMISTIC_WRITE)
+	Optional<DeliveryManager> findFirstByHubIdIsNullOrderByLastDeliveryTimeAscDeliveryOrderAsc();
 
 	// 업체 담당자용 (hubId 지정)
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    Optional<DeliveryManager> findFirstByHubIdOrderByLastDeliveryTimeAscDeliveryOrderAsc(UUID hubId);
+	@Lock(LockModeType.PESSIMISTIC_WRITE)
+	Optional<DeliveryManager> findFirstByHubIdOrderByLastDeliveryTimeAscDeliveryOrderAsc(UUID hubId);
 
-    boolean existsByHubIdAndDeliveryManagerId(UUID hubId, Long managerId);
-    Integer findLastDeliveryOrderByHubIdForUpdate(@Param("hubId") UUID hubId);
-    Integer findLastDeliveryOrderForNullHubForUpdate();
+	boolean existsByHubIdAndDeliveryManagerId(UUID hubId, Long managerId);
 
+	Integer findLastDeliveryOrderByHubIdForUpdate(@Param("hubId") UUID hubId);
+
+	Integer findLastDeliveryOrderForNullHubForUpdate();
 }

@@ -6,10 +6,10 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication
 @EnableFeignClients(
-    basePackages = {
-        "com.hubEleven.delivery.infrastructure.client",
-        "com.hubEleven.deliveryManager.infrastructure.client"
-    })
+		basePackages = {
+			"com.hubEleven.delivery.infrastructure.client",
+			"com.hubEleven.deliveryManager.infrastructure.client"
+		})
 public class DeliveryApplication {
 
 	public static void main(String[] args) {
