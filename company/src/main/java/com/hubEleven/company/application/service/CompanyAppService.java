@@ -8,12 +8,16 @@ import com.commonLib.common.request.CommonPageRequest;
 import com.commonLib.common.response.CommonPageResponse;
 import com.commonLib.common.utils.PagingUtils;
 import com.hubEleven.company.application.dto.CompanyDTO;
+import com.hubEleven.company.domain.exception.CompanyErrorCode;
 import com.hubEleven.company.domain.model.Company;
 import com.hubEleven.company.domain.model.CompanyStatus;
 import com.hubEleven.company.domain.model.CompanyType;
 import com.hubEleven.company.domain.repository.CompanyRepository;
 import com.hubEleven.company.domain.repository.CompanySearchCondition;
 import com.hubEleven.company.infrastructure.client.HubClient;
+import com.hubEleven.company.infrastructure.security.AuthUser;
+import com.hubEleven.company.infrastructure.security.AuthUserContext;
+import com.hubEleven.company.infrastructure.security.Role;
 import com.hubEleven.company.presentation.request.CompanyRequests;
 import java.util.Optional;
 import java.util.UUID;
@@ -28,6 +32,11 @@ public class CompanyAppService {
 	private final CompanyRepository companyRepository;
 	private final HubClient hubClient;
 
+	private AuthUser currentUser() {
+		return AuthUserContext.get();
+	}
+
+	// ✅ 중복 선언 제거 - 이 메서드만 남깁니다.
 	private void assertHubExists(UUID hubId) {
 		try {
 			hubClient.getHub(hubId);
@@ -38,24 +47,56 @@ public class CompanyAppService {
 		}
 	}
 
+	private void assertCreateAccess(UUID hubId) {
+		AuthUser user = currentUser();
+		if (user == null) throw new GlobalException(CompanyErrorCode.UNAUTHORIZED);
+
+		if (user.role() == Role.MASTER) return;
+		if (user.role() == Role.HUB_MANAGER && hubId != null && hubId.equals(user.hubId())) return;
+
+		throw new GlobalException(CompanyErrorCode.FORBIDDEN);
+	}
+
+	private void assertUpdateAccess(UUID hubId, UUID companyId) {
+		AuthUser user = currentUser();
+		if (user == null) throw new GlobalException(CompanyErrorCode.UNAUTHORIZED);
+
+		if (user.role() == Role.MASTER) return;
+		if (user.role() == Role.HUB_MANAGER && hubId != null && hubId.equals(user.hubId())) return;
+		if (user.role() == Role.COMPANY_MANAGER && companyId != null && companyId.equals(user.companyId())) return;
+
+		throw new GlobalException(CompanyErrorCode.FORBIDDEN);
+	}
+
+	private void assertDeleteAccess(UUID hubId) {
+		AuthUser user = currentUser();
+		if (user == null) throw new GlobalException(CompanyErrorCode.UNAUTHORIZED);
+
+		if (user.role() == Role.MASTER) return;
+		if (user.role() == Role.HUB_MANAGER && hubId != null && hubId.equals(user.hubId())) return;
+
+		throw new GlobalException(CompanyErrorCode.FORBIDDEN);
+	}
+
 	@Transactional
 	public CompanyDTO createCompany(CompanyRequests.Create req) {
+		assertCreateAccess(req.hubId());
 		assertHubExists(req.hubId());
+
 		if (companyRepository.existsByHubIdAndName(req.hubId(), req.name())) {
 			throw new GlobalException(COMPANY_DUPLICATED);
 		}
-		Company company =
-				Company.create(req.hubId(), req.name(), req.type(), req.slackId(), req.address());
+
+		Company company = Company.create(req.hubId(), req.name(), req.type(), req.slackId(), req.address());
 		return CompanyDTO.from(companyRepository.save(company));
 	}
 
 	@Transactional
 	public CompanyDTO updateCompany(UUID companyId, CompanyRequests.Update req) {
-		var company =
-				companyRepository
-						.findById(companyId)
-						.orElseThrow(() -> new GlobalException(COMPANY_NOT_FOUND));
+		var company = companyRepository.findById(companyId)
+				.orElseThrow(() -> new GlobalException(COMPANY_NOT_FOUND));
 
+		assertUpdateAccess(company.getHubId(), company.getCompanyId());
 		assertHubExists(company.getHubId());
 
 		if (req.name() != null && !req.name().isBlank()) {
@@ -64,6 +105,7 @@ public class CompanyAppService {
 				throw new GlobalException(COMPANY_DUPLICATED);
 			}
 		}
+
 		company.changeType(req.type());
 		company.update(req.name(), req.address(), req.slackId());
 		return CompanyDTO.from(company);
@@ -71,18 +113,15 @@ public class CompanyAppService {
 
 	@Transactional(readOnly = true)
 	public CompanyDTO getCompany(UUID companyId) {
-		var company =
-				companyRepository
-						.findById(companyId)
-						.orElseThrow(() -> new GlobalException(COMPANY_NOT_FOUND));
+		var company = companyRepository.findById(companyId)
+				.orElseThrow(() -> new GlobalException(COMPANY_NOT_FOUND));
 		return CompanyDTO.from(company);
 	}
 
 	@Transactional(readOnly = true)
 	public CommonPageResponse<CompanyDTO> findCompanyList(CommonPageRequest pageReq) {
-		var page =
-				companyRepository.search(
-						new CompanySearchCondition(null, null, null, null), pageReq.toPageable());
+		var page = companyRepository.search(
+				new CompanySearchCondition(null, null, null, null), pageReq.toPageable());
 		return PagingUtils.convert(page, CompanyDTO::from);
 	}
 
@@ -93,19 +132,19 @@ public class CompanyAppService {
 			Optional<CompanyType> type,
 			Optional<CompanyStatus> status,
 			CommonPageRequest pageReq) {
-		var cond =
-				new CompanySearchCondition(
-						hubId.orElse(null), name.orElse(null), type.orElse(null), status.orElse(null));
+
+		var cond = new CompanySearchCondition(
+				hubId.orElse(null), name.orElse(null), type.orElse(null), status.orElse(null));
 		var page = companyRepository.search(cond, pageReq.toPageable());
 		return PagingUtils.convert(page, CompanyDTO::from);
 	}
 
 	@Transactional
 	public CompanyDTO changeStatus(UUID companyId, String rawStatus) {
-		var company =
-				companyRepository
-						.findById(companyId)
-						.orElseThrow(() -> new GlobalException(COMPANY_NOT_FOUND));
+		var company = companyRepository.findById(companyId)
+				.orElseThrow(() -> new GlobalException(COMPANY_NOT_FOUND));
+
+		assertUpdateAccess(company.getHubId(), company.getCompanyId());
 
 		CompanyStatus newStatus;
 		try {
@@ -113,16 +152,18 @@ public class CompanyAppService {
 		} catch (IllegalArgumentException e) {
 			throw new GlobalException(ErrorCode.SERVER_ERROR);
 		}
+
 		company.changeStatus(newStatus);
 		return CompanyDTO.from(company);
 	}
 
 	@Transactional
-	public void deleteCompany(UUID companyId, Long deleterId) {
-		var company =
-				companyRepository
-						.findById(companyId)
-						.orElseThrow(() -> new GlobalException(COMPANY_NOT_FOUND));
-		company.delete(deleterId);
+	public void deleteCompany(UUID companyId) {
+		var company = companyRepository.findById(companyId)
+				.orElseThrow(() -> new GlobalException(COMPANY_NOT_FOUND));
+
+		assertDeleteAccess(company.getHubId());
+
+		company.delete(currentUser().userId());
 	}
 }

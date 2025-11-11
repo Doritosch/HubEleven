@@ -28,7 +28,6 @@ public class CompanyController {
 
 	private final CompanyAppService companyAppService;
 
-	@PreAuthorize("hasAnyRole('MASTER','HUB_MANAGER')")
 	@Operation(summary = "업체 생성 API", description = "새로운 업체를 생성한다.")
 	@PostMapping
 	public ResponseEntity<ApiResponse<CompanyResponse>> create(
@@ -37,7 +36,6 @@ public class CompanyController {
 		return ApiResponseEntity.success(CompanyResponse.from(dto));
 	}
 
-	@PreAuthorize("hasAnyRole('MASTER','HUB_MANAGER','COMPANY_MANAGER')")
 	@Operation(summary = "업체 수정 API", description = "업체의 기본 정보를 수정한다.")
 	@PatchMapping("/{companyId}")
 	public ResponseEntity<ApiResponse<CompanyResponse>> updateCompany(
@@ -46,7 +44,6 @@ public class CompanyController {
 		return ApiResponseEntity.success(CompanyResponse.from(dto));
 	}
 
-	@PreAuthorize("isAuthenticated()")
 	@Operation(summary = "업체 단건 조회 API", description = "업체 ID로 업체를 조회한다.")
 	@GetMapping("/{companyId}")
 	public ResponseEntity<ApiResponse<CompanyResponse>> getCompany(@PathVariable UUID companyId) {
@@ -54,25 +51,22 @@ public class CompanyController {
 		return ApiResponseEntity.success(CompanyResponse.from(dto));
 	}
 
-	@PreAuthorize("isAuthenticated()")
 	@Operation(summary = "업체 목록 조회 API", description = "업체 전체 목록을 조회한다.")
 	@GetMapping
 	public ResponseEntity<ApiResponse<CommonPageResponse<CompanyResponse>>> getCompanyList(
 			@Valid CommonPageRequest pageReq) {
 		var page = companyAppService.findCompanyList(pageReq);
-		var mapped =
-				new CommonPageResponse<>(
-						page.content().stream().map(CompanyResponse::from).toList(),
-						page.page(),
-						page.size(),
-						page.totalElements(),
-						page.totalPages(),
-						page.first(),
-						page.last());
+		var mapped = new CommonPageResponse<>(
+				page.content().stream().map(CompanyResponse::from).toList(),
+				page.page(),
+				page.size(),
+				page.totalElements(),
+				page.totalPages(),
+				page.first(),
+				page.last());
 		return ApiResponseEntity.success(mapped);
 	}
 
-	@PreAuthorize("isAuthenticated()")
 	@Operation(summary = "업체 검색 API", description = "허브, 이름, 타입 등으로 업체를 검색한다.")
 	@GetMapping("/search")
 	public ResponseEntity<ApiResponse<CommonPageResponse<CompanyResponse>>> search(
@@ -81,27 +75,25 @@ public class CompanyController {
 			@RequestParam(required = false) String name,
 			@RequestParam(required = false) CompanyType type,
 			@RequestParam(required = false) CompanyStatus status) {
-		var page =
-				companyAppService.searchCompany(
-						Optional.ofNullable(hubId),
-						Optional.ofNullable(name),
-						Optional.ofNullable(type),
-						Optional.ofNullable(status),
-						pageReq);
 
-		var mapped =
-				new CommonPageResponse<>(
-						page.content().stream().map(CompanyResponse::from).toList(),
-						page.page(),
-						page.size(),
-						page.totalElements(),
-						page.totalPages(),
-						page.first(),
-						page.last());
+		var page = companyAppService.searchCompany(
+				Optional.ofNullable(hubId),
+				Optional.ofNullable(name),
+				Optional.ofNullable(type),
+				Optional.ofNullable(status),
+				pageReq);
+
+		var mapped = new CommonPageResponse<>(
+				page.content().stream().map(CompanyResponse::from).toList(),
+				page.page(),
+				page.size(),
+				page.totalElements(),
+				page.totalPages(),
+				page.first(),
+				page.last());
 		return ApiResponseEntity.success(mapped);
 	}
 
-	@PreAuthorize("hasAnyRole('MASTER','HUB_MANAGER','COMPANY_MANAGER')")
 	@Operation(summary = "업체 상태 변경 API", description = "업체의 상태를 변경한다.")
 	@PatchMapping("/{companyId}/status")
 	public ResponseEntity<ApiResponse<CompanyResponse>> updateCompanyStatus(
@@ -110,13 +102,10 @@ public class CompanyController {
 		return ApiResponseEntity.success(CompanyResponse.from(dto));
 	}
 
-	@PreAuthorize("hasAnyRole('MASTER','HUB_MANAGER')")
 	@Operation(summary = "업체 삭제 API", description = "업체를 삭제한다.")
 	@DeleteMapping("{companyId}")
-	public ResponseEntity<ApiResponse<Object>> deleteCompany(
-			@PathVariable("companyId") UUID companyId) {
-		companyAppService.deleteCompany(companyId, null);
-
+	public ResponseEntity<ApiResponse<Object>> deleteCompany(@PathVariable UUID companyId) {
+		companyAppService.deleteCompany(companyId);
 		return ApiResponseEntity.success(null);
 	}
 }
