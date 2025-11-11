@@ -1,10 +1,10 @@
 package com.hubEleven.notification.slack.application.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.commonLib.common.exception.GlobalException;
 import com.commonLib.common.request.CommonPageRequest;
 import com.commonLib.common.response.CommonPageResponse;
 import com.commonLib.common.utils.PagingUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hubEleven.notification.ai.application.dto.MessageGenerationResponse;
 import com.hubEleven.notification.ai.domain.exception.NotificationErrorCode;
 import com.hubEleven.notification.ai.domain.repository.AiRequestLogRepository;
@@ -43,9 +43,10 @@ public class SlackMessageAppService {
 
 		slackMessageRepository
 				.findFirstByOrderIdAndStatus(request.orderId(), SlackMessageStatus.SENT)
-				.ifPresent(m -> {
-					throw new GlobalException(SlackMessageErrorCode.SLACK_MESSAGE_ALREADY_SENT);
-				});
+				.ifPresent(
+						m -> {
+							throw new GlobalException(SlackMessageErrorCode.SLACK_MESSAGE_ALREADY_SENT);
+						});
 
 		Long currentUserId = getCurrentUserId();
 
@@ -53,12 +54,9 @@ public class SlackMessageAppService {
 
 		String formattedMessage = slackMessageDomainService.formatMessage(request, aiResponse);
 
-		SlackMessage slackMessage = SlackMessage.create(
-				request.orderId(),
-				request.recipientId(),
-				request.channel(),
-				formattedMessage
-		);
+		SlackMessage slackMessage =
+				SlackMessage.create(
+						request.orderId(), request.recipientId(), request.channel(), formattedMessage);
 
 		SlackMessage savedSlackMessage = slackMessageRepository.save(slackMessage);
 
@@ -69,9 +67,10 @@ public class SlackMessageAppService {
 
 	@Transactional
 	public SlackMessageResponse updateMessage(UUID messageId, SlackMessageUpdateRequest request) {
-		SlackMessage slackMessage = slackMessageRepository
-				.findById(messageId)
-				.orElseThrow(() -> new GlobalException(SlackMessageErrorCode.SLACK_MESSAGE_NOT_FOUND));
+		SlackMessage slackMessage =
+				slackMessageRepository
+						.findById(messageId)
+						.orElseThrow(() -> new GlobalException(SlackMessageErrorCode.SLACK_MESSAGE_NOT_FOUND));
 
 		slackMessage.updateMessage(request.message());
 		SlackMessage updatedSlackMessage = slackMessageRepository.save(slackMessage);
@@ -83,18 +82,20 @@ public class SlackMessageAppService {
 	public void deleteMessage(UUID messageId) {
 		Long currentUserId = getCurrentUserId();
 
-		SlackMessage slackMessage = slackMessageRepository
-				.findById(messageId)
-				.orElseThrow(() -> new GlobalException(SlackMessageErrorCode.SLACK_MESSAGE_NOT_FOUND));
+		SlackMessage slackMessage =
+				slackMessageRepository
+						.findById(messageId)
+						.orElseThrow(() -> new GlobalException(SlackMessageErrorCode.SLACK_MESSAGE_NOT_FOUND));
 
 		slackMessage.delete(currentUserId);
 		slackMessageRepository.save(slackMessage);
 	}
 
 	public SlackMessageResponse getMessage(UUID messageId) {
-		SlackMessage slackMessage = slackMessageRepository
-				.findById(messageId)
-				.orElseThrow(() -> new GlobalException(SlackMessageErrorCode.SLACK_MESSAGE_NOT_FOUND));
+		SlackMessage slackMessage =
+				slackMessageRepository
+						.findById(messageId)
+						.orElseThrow(() -> new GlobalException(SlackMessageErrorCode.SLACK_MESSAGE_NOT_FOUND));
 
 		return SlackMessageResponse.from(slackMessage);
 	}
@@ -106,14 +107,16 @@ public class SlackMessageAppService {
 			LocalDateTime dateTo,
 			CommonPageRequest pageReq) {
 
-		var page = slackMessageRepository.search(status, channel, dateFrom, dateTo, pageReq.toPageable());
+		var page =
+				slackMessageRepository.search(status, channel, dateFrom, dateTo, pageReq.toPageable());
 		return PagingUtils.convert(page, SlackMessageResponse::from);
 	}
 
 	private MessageGenerationResponse findAiResultOrThrow(UUID orderId) {
-		var log = aiRequestLogRepository
-				.findByOrderId(orderId)
-				.orElseThrow(() -> new GlobalException(NotificationErrorCode.AI_RESPONSE_PARSE_FAIL));
+		var log =
+				aiRequestLogRepository
+						.findByOrderId(orderId)
+						.orElseThrow(() -> new GlobalException(NotificationErrorCode.AI_RESPONSE_PARSE_FAIL));
 
 		String raw = log.getRawResponse();
 		String cleaned = cleanJsonResponse(raw);
@@ -170,14 +173,17 @@ public class SlackMessageAppService {
 
 	@Transactional
 	protected void updateMessageStatus(UUID messageId, SlackMessageStatus status) {
-		slackMessageRepository.findById(messageId).ifPresent(message -> {
-			if (status == SlackMessageStatus.SENT) {
-				message.markAsSent();
-			} else if (status == SlackMessageStatus.FAILED) {
-				message.markAsFailed();
-			}
-			slackMessageRepository.save(message);
-		});
+		slackMessageRepository
+				.findById(messageId)
+				.ifPresent(
+						message -> {
+							if (status == SlackMessageStatus.SENT) {
+								message.markAsSent();
+							} else if (status == SlackMessageStatus.FAILED) {
+								message.markAsFailed();
+							}
+							slackMessageRepository.save(message);
+						});
 	}
 
 	private Long getCurrentUserId() {
