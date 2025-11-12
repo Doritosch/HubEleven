@@ -4,7 +4,6 @@ import com.commonLib.common.exception.GlobalException;
 import com.hubEleven.notification.ai.domain.exception.NotificationErrorCode;
 import com.hubEleven.notification.ai.infrastructure.client.dto.GeminiRequest;
 import com.hubEleven.notification.ai.infrastructure.client.dto.GeminiResponse;
-import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -12,7 +11,6 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 @Slf4j
 @Component
@@ -53,14 +51,20 @@ public class GeminiClient {
 								resp.bodyToMono(String.class)
 										.map(msg -> new GlobalException(NotificationErrorCode.AI_UPSTREAM_UNAVAILABLE)))
 				.bodyToMono(GeminiResponse.class)
-				.onErrorMap(ex -> {
-					log.error("Error calling Gemini API", ex);
-					return new GlobalException(NotificationErrorCode.AI_UPSTREAM_UNAVAILABLE);
-				})
+				.onErrorMap(
+						ex -> {
+							log.error("Error calling Gemini API", ex);
+							return new GlobalException(NotificationErrorCode.AI_UPSTREAM_UNAVAILABLE);
+						})
 				.blockOptional()
-				.orElseThrow(() -> {
-					log.error("GeminiClient: response body is empty for prompt (truncated): {}", prompt == null ? "" : (prompt.length() > 200 ? prompt.substring(0,200) : prompt));
-					return new GlobalException(NotificationErrorCode.AI_UPSTREAM_UNAVAILABLE);
-				});
+				.orElseThrow(
+						() -> {
+							log.error(
+									"GeminiClient: response body is empty for prompt (truncated): {}",
+									prompt == null
+											? ""
+											: (prompt.length() > 200 ? prompt.substring(0, 200) : prompt));
+							return new GlobalException(NotificationErrorCode.AI_UPSTREAM_UNAVAILABLE);
+						});
 	}
 }

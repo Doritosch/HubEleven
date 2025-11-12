@@ -78,14 +78,14 @@ public class SlackMessageAppService {
 
 	@Transactional
 	public void deleteMessage(UUID messageId) {
-		//Long currentUserId = getCurrentUserId();
+		// Long currentUserId = getCurrentUserId();
 
 		SlackMessage slackMessage =
 				slackMessageRepository
 						.findById(messageId)
 						.orElseThrow(() -> new GlobalException(SlackMessageErrorCode.SLACK_MESSAGE_NOT_FOUND));
 
-		//slackMessage.delete(currentUserId);
+		// slackMessage.delete(currentUserId);
 		slackMessage.delete(null);
 		slackMessageRepository.save(slackMessage);
 	}

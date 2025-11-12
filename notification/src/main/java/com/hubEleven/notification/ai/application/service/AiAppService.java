@@ -62,11 +62,16 @@ public class AiAppService {
 			requestLog.success(raw, metadata);
 			return result;
 		} catch (GlobalException ex) {
-			log.error("GlobalException occurred for orderId: {} - {}", request.orderId(), ex.getMessage(), ex);
+			log.error(
+					"GlobalException occurred for orderId: {} - {}", request.orderId(), ex.getMessage(), ex);
 			requestLog.fail(ex.getMessage(), metadata);
 			throw ex;
 		} catch (Exception ex) {
-			log.error("Unexpected exception occurred for orderId: {} - {}", request.orderId(), ex.getMessage(), ex);
+			log.error(
+					"Unexpected exception occurred for orderId: {} - {}",
+					request.orderId(),
+					ex.getMessage(),
+					ex);
 			requestLog.fail(ex.getMessage(), metadata);
 			throw new GlobalException(NotificationErrorCode.AI_GENERATION_FAIL);
 		}
