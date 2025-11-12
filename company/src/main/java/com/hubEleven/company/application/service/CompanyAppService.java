@@ -177,5 +177,6 @@ public class CompanyAppService {
 		assertDeleteAccess(company.getHubId());
 
 		company.delete(currentUser().userId());
+		companyRepository.save(company);
 	}
 }
