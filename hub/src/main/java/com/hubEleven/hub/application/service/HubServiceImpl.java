@@ -32,7 +32,6 @@ public class HubServiceImpl implements HubService {
 		this.kakaoApiClient = kakaoApiClient;
 	}
 
-
 	@Override
 	@CacheEvict(value = "hub-list", allEntries = true)
 	public HubResult createHub(CreateHubCommand command) {
@@ -93,7 +92,9 @@ public class HubServiceImpl implements HubService {
 	}
 
 	@Override
-	@CacheEvict(value = {"hubs", "hub-list"}, key = "#command.hubId")
+	@CacheEvict(
+			value = {"hubs", "hub-list"},
+			key = "#command.hubId")
 	public void deleteHub(DeleteHubCommand command) {
 		UUID hubId = command.hubId();
 		Hub hub = findHubById(hubId);
