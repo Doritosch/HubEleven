@@ -38,7 +38,8 @@ public class DeliveryManagerCreateTest {
 	void testConcurrentDeliveryOrderCreation() throws InterruptedException {
 		ExecutorService executor = Executors.newFixedThreadPool(THREAD_COUNT);
 		Set<Integer> deliveryOrders = ConcurrentHashMap.newKeySet(); // thread-safe
-
+        String role = "MASTER";
+        Long id = 1L;
 		for (int i = 0; i < THREAD_COUNT; i++) {
 			final long managerId = 1000 + i; // 각 쓰레드별 고유 ID
 			executor.submit(

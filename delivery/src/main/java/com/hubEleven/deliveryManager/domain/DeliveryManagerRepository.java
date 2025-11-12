@@ -16,6 +16,8 @@ public interface DeliveryManagerRepository {
 
 	Optional<DeliveryManager> findById(Long id);
 
+    Optional<DeliveryManager> findByDeliveryManagerIdAndDeletedAtIsNull(Long managerId);
+
 	List<DeliveryManager> findAll();
 
 	Page<DeliveryManager> findAll(Pageable pageable);
@@ -23,6 +25,8 @@ public interface DeliveryManagerRepository {
 	Page<DeliveryManager> findAll(Specification<DeliveryManager> spec, Pageable pageable);
 
 	Page<DeliveryManager> findAllByHubId(UUID hubId, Pageable pageable);
+
+    Page<DeliveryManager> findAllByHubIdANdDeletedAtISNULL(UUID hubId, Pageable pageable);
 
 	Optional<DeliveryManager> findByDeliveryManagerIdAndDeletedAtIsNotNull(Long id);
 

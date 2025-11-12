@@ -64,8 +64,4 @@ public class DeliveryManager extends BaseEntity {
 		this.lastDeliveryTime = LocalDateTime.now();
 	}
 
-	// 임시
-	public void softDelete(Long deletedBy) {
-		delete(deletedBy);
-	}
 }
