@@ -43,7 +43,18 @@ public class AiAppService {
 		try {
 			GeminiResponse response =
 					geminiClient.generate(aiProperties.model(), aiProperties.api().key(), prompt);
+
+			if (response == null) {
+				log.error("GeminiClient returned null response for orderId: {}", request.orderId());
+				requestLog.fail("Gemini returned null response", metadata);
+				throw new GlobalException(NotificationErrorCode.AI_UPSTREAM_UNAVAILABLE);
+			}
 			String raw = response.primaryText();
+			if (raw == null || raw.isBlank()) {
+				log.error("GeminiClient returned empty primaryText for orderId: {}", request.orderId());
+				requestLog.fail("Gemini returned empty body", metadata);
+				throw new GlobalException(NotificationErrorCode.AI_UPSTREAM_UNAVAILABLE);
+			}
 
 			log.info("Gemini raw response for orderId: {} - {}", request.orderId(), raw);
 
@@ -51,16 +62,11 @@ public class AiAppService {
 			requestLog.success(raw, metadata);
 			return result;
 		} catch (GlobalException ex) {
-			log.error(
-					"GlobalException occurred for orderId: {} - {}", request.orderId(), ex.getMessage(), ex);
+			log.error("GlobalException occurred for orderId: {} - {}", request.orderId(), ex.getMessage(), ex);
 			requestLog.fail(ex.getMessage(), metadata);
 			throw ex;
 		} catch (Exception ex) {
-			log.error(
-					"Unexpected exception occurred for orderId: {} - {}",
-					request.orderId(),
-					ex.getMessage(),
-					ex);
+			log.error("Unexpected exception occurred for orderId: {} - {}", request.orderId(), ex.getMessage(), ex);
 			requestLog.fail(ex.getMessage(), metadata);
 			throw new GlobalException(NotificationErrorCode.AI_GENERATION_FAIL);
 		}
@@ -106,13 +112,13 @@ public class AiAppService {
 
 		// ```json ... ``` 형태의 코드 블록 제거
 		if (cleaned.startsWith("```json")) {
-			cleaned = cleaned.substring(7); // "```json" 제거
+			cleaned = cleaned.substring(7);
 		} else if (cleaned.startsWith("```")) {
-			cleaned = cleaned.substring(3); // "```" 제거
+			cleaned = cleaned.substring(3);
 		}
 
 		if (cleaned.endsWith("```")) {
-			cleaned = cleaned.substring(0, cleaned.length() - 3); // "```" 제거
+			cleaned = cleaned.substring(0, cleaned.length() - 3);
 		}
 
 		return cleaned.trim();
