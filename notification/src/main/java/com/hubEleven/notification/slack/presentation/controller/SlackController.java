@@ -18,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 // TODO: 권한체크 - 로그인한 모든 사용자/ 내부 시스템은 발송 가능하도록 (create만)
@@ -30,7 +29,6 @@ public class SlackController {
 
 	private final SlackMessageAppService slackMessageAppService;
 
-	@PreAuthorize("isAuthenticated()")
 	@Operation(summary = "메시지 발송 API", description = "AI를 통해 메시지를 생성하고 Slack으로 발송한다.")
 	@PostMapping
 	public ResponseEntity<ApiResponse<SlackMessageResponse>> createMessage(
@@ -39,7 +37,6 @@ public class SlackController {
 		return ApiResponseEntity.success(response);
 	}
 
-	@PreAuthorize("hasAuthority('MASTER')")
 	@Operation(summary = "메시지 수정 API", description = "기존 Slack 메시지를 수정합니다.")
 	@PatchMapping("/{messageId}")
 	public ResponseEntity<ApiResponse<SlackMessageResponse>> updateMessage(
@@ -48,7 +45,6 @@ public class SlackController {
 		return ApiResponseEntity.success(response);
 	}
 
-	@PreAuthorize("hasAuthority('MASTER')")
 	@Operation(summary = "메시지 삭제 API", description = "Slack 메시지를 삭제한다.")
 	@DeleteMapping("/{messageId}")
 	public ResponseEntity<Void> deleteMessage(@PathVariable UUID messageId) {
@@ -56,7 +52,6 @@ public class SlackController {
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
-	@PreAuthorize("hasAuthority('MASTER')")
 	@Operation(summary = "메시지 상세 조회 API", description = "특정 Slack 메시지의 상세 정보를 조회한다.")
 	@GetMapping("/{messageId}")
 	public ResponseEntity<ApiResponse<SlackMessageResponse>> getMessage(
@@ -65,7 +60,6 @@ public class SlackController {
 		return ApiResponseEntity.success(response);
 	}
 
-	@PreAuthorize("hasAuthority('MASTER')")
 	@Operation(summary = "메시지 목록/검색 API", description = "조건에 따라 Slack 메시지 목록을 조회한다.")
 	@GetMapping
 	public ResponseEntity<ApiResponse<CommonPageResponse<SlackMessageResponse>>> searchMessages(

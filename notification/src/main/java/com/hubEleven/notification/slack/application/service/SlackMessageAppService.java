@@ -21,8 +21,6 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,7 +46,7 @@ public class SlackMessageAppService {
 							throw new GlobalException(SlackMessageErrorCode.SLACK_MESSAGE_ALREADY_SENT);
 						});
 
-		Long currentUserId = getCurrentUserId();
+		// Long currentUserId = getCurrentUserId();
 
 		MessageGenerationResponse aiResponse = findAiResultOrThrow(request.orderId());
 
@@ -80,14 +78,15 @@ public class SlackMessageAppService {
 
 	@Transactional
 	public void deleteMessage(UUID messageId) {
-		Long currentUserId = getCurrentUserId();
+		//Long currentUserId = getCurrentUserId();
 
 		SlackMessage slackMessage =
 				slackMessageRepository
 						.findById(messageId)
 						.orElseThrow(() -> new GlobalException(SlackMessageErrorCode.SLACK_MESSAGE_NOT_FOUND));
 
-		slackMessage.delete(currentUserId);
+		//slackMessage.delete(currentUserId);
+		slackMessage.delete(null);
 		slackMessageRepository.save(slackMessage);
 	}
 
@@ -187,13 +186,8 @@ public class SlackMessageAppService {
 	}
 
 	private Long getCurrentUserId() {
-		var auth = SecurityContextHolder.getContext().getAuthentication();
-		if (auth instanceof JwtAuthenticationToken token) {
-			Object claim = token.getToken().getClaim("userId");
-			if (claim instanceof Integer i) return i.longValue();
-			if (claim instanceof Long l) return l;
-			if (claim instanceof String s) return Long.parseLong(s);
-		}
+		// 권한 로직 제거로 인해 임시로 null 반환
+		// TODO: 필요시 다른 방식으로 사용자 ID를 가져오도록 수정
 		return null;
 	}
 }
