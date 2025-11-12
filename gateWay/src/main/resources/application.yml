@@ -95,7 +95,7 @@ spring:
             - id: notification-service
               uri: lb://notification-service
               predicates:
-                - Path=/v1/ai/**, /v1/slack
+                - Path=/v1/ai/**, /v1/slack/**
 
             - id: notification-service-openapi
               uri: lb://notification-service
