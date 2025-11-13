@@ -61,4 +61,8 @@ public interface DeliveryManagerJpaRepository
 				""",
 			nativeQuery = true)
 	Integer findLastDeliveryOrderForNullHubForUpdate();
+
+	Page<DeliveryManager> findAllByHubIdAndDeletedAtIsNull(UUID hubId, Pageable pageable);
+
+	Optional<DeliveryManager> findByDeliveryManagerIdAndDeletedAtIsNull(Long managerId);
 }

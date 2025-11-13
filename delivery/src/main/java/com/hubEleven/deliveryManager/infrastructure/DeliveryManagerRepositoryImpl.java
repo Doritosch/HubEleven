@@ -30,6 +30,11 @@ public class DeliveryManagerRepositoryImpl implements DeliveryManagerRepository 
 	}
 
 	@Override
+	public Optional<DeliveryManager> findByDeliveryManagerIdAndDeletedAtIsNull(Long managerId) {
+		return deliveryManagerJpaRepository.findByDeliveryManagerIdAndDeletedAtIsNull(managerId);
+	}
+
+	@Override
 	public List<DeliveryManager> findAll() {
 		return deliveryManagerJpaRepository.findAll();
 	}
@@ -48,6 +53,11 @@ public class DeliveryManagerRepositoryImpl implements DeliveryManagerRepository 
 	@Override
 	public Page<DeliveryManager> findAllByHubId(UUID hubId, Pageable pageable) {
 		return deliveryManagerJpaRepository.findAllByHubId(hubId, pageable);
+	}
+
+	@Override
+	public Page<DeliveryManager> findAllByHubIdANdDeletedAtISNULL(UUID hubId, Pageable pageable) {
+		return deliveryManagerJpaRepository.findAllByHubIdAndDeletedAtIsNull(hubId, pageable);
 	}
 
 	@Override

@@ -63,6 +63,10 @@ dependencies {
     implementation 'io.github.openfeign:feign-micrometer'
     implementation 'com.github.Doritosch:commonLib:1.0.5'
 
+    //맥에서 webflux
+    implementation 'io.netty:netty-resolver-dns-native-macos:4.1.110.Final:osx-aarch_64'
+    implementation 'com.h2database:h2'
+
 }
 
 dependencyManagement {
