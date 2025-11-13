@@ -1,10 +1,10 @@
 package com.hubEleven.notification.slack.presentation.controller;
 
+import com.commonLib.common.exception.GlobalException;
 import com.commonLib.common.request.CommonPageRequest;
 import com.commonLib.common.response.ApiResponse;
 import com.commonLib.common.response.ApiResponseEntity;
 import com.commonLib.common.response.CommonPageResponse;
-import com.commonLib.common.exception.GlobalException;
 import com.hubEleven.notification.slack.application.dto.SlackMessageCreateRequest;
 import com.hubEleven.notification.slack.application.dto.SlackMessageResponse;
 import com.hubEleven.notification.slack.application.dto.SlackMessageUpdateRequest;
@@ -57,7 +57,8 @@ public class SlackController {
 			@PathVariable UUID messageId,
 			@Valid @RequestBody SlackMessageUpdateRequest request) {
 		AuthUser authUser = resolveAuthUser(userId, roleHeader, hubIdHeader, companyIdHeader);
-		SlackMessageResponse response = slackMessageAppService.updateMessage(authUser, messageId, request);
+		SlackMessageResponse response =
+				slackMessageAppService.updateMessage(authUser, messageId, request);
 		return ApiResponseEntity.success(response);
 	}
 
@@ -97,16 +98,18 @@ public class SlackController {
 			@RequestParam(required = false) SlackMessageStatus status,
 			@RequestParam(required = false) String channel,
 			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-			LocalDateTime dateFrom,
+					LocalDateTime dateFrom,
 			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-			LocalDateTime dateTo,
+					LocalDateTime dateTo,
 			@Valid CommonPageRequest pageReq) {
 		AuthUser authUser = resolveAuthUser(userId, roleHeader, hubIdHeader, companyIdHeader);
-		var page = slackMessageAppService.searchMessages(authUser, status, channel, dateFrom, dateTo, pageReq);
+		var page =
+				slackMessageAppService.searchMessages(authUser, status, channel, dateFrom, dateTo, pageReq);
 		return ApiResponseEntity.success(page);
 	}
 
-	private AuthUser resolveAuthUser(Long userId, String roleHeader, String hubIdHeader, String companyIdHeader) {
+	private AuthUser resolveAuthUser(
+			Long userId, String roleHeader, String hubIdHeader, String companyIdHeader) {
 		if (userId == null || !StringUtils.hasText(roleHeader)) {
 			throw new GlobalException(SlackMessageErrorCode.UNAUTHORIZED);
 		}
@@ -119,7 +122,8 @@ public class SlackController {
 			throw new GlobalException(SlackMessageErrorCode.UNAUTHORIZED);
 		}
 
-		return new AuthUser(userId, role, parseUuidOrNull(hubIdHeader), parseUuidOrNull(companyIdHeader));
+		return new AuthUser(
+				userId, role, parseUuidOrNull(hubIdHeader), parseUuidOrNull(companyIdHeader));
 	}
 
 	private UUID parseUuidOrNull(String raw) {
