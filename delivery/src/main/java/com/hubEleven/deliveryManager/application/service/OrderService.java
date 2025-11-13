@@ -13,21 +13,20 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class OrderService {
-    private final OrderFeignClient orderFeignClient;
+	private final OrderFeignClient orderFeignClient;
 
-    public OrderService(OrderFeignClient orderFeignClient) {
-        this.orderFeignClient = orderFeignClient;
-    }
+	public OrderService(OrderFeignClient orderFeignClient) {
+		this.orderFeignClient = orderFeignClient;
+	}
 
-    public OrderResponse getOrder(UUID orderId) {
+	public OrderResponse getOrder(UUID orderId) {
 
-        ResponseEntity<ApiResponse<OrderResponse>> response = orderFeignClient.getOrderDetail(orderId);
+		ResponseEntity<ApiResponse<OrderResponse>> response = orderFeignClient.getOrderDetail(orderId);
 
-        if(response == null) {
-            throw new GlobalException(DeliveryManagerErrorCode.ORDER_NOT_FOUND);
-        }
-        log.info("order 정보 받아옴");
-        return response.getBody().result();
-
-    }
+		if (response == null) {
+			throw new GlobalException(DeliveryManagerErrorCode.ORDER_NOT_FOUND);
+		}
+		log.info("order 정보 받아옴");
+		return response.getBody().result();
+	}
 }

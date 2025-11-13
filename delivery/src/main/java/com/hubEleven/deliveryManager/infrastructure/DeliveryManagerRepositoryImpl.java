@@ -29,12 +29,12 @@ public class DeliveryManagerRepositoryImpl implements DeliveryManagerRepository 
 		return deliveryManagerJpaRepository.findById(id);
 	}
 
-    @Override
-    public Optional<DeliveryManager> findByDeliveryManagerIdAndDeletedAtIsNull(Long managerId) {
-        return deliveryManagerJpaRepository.findByDeliveryManagerIdAndDeletedAtIsNull(managerId);
-    }
+	@Override
+	public Optional<DeliveryManager> findByDeliveryManagerIdAndDeletedAtIsNull(Long managerId) {
+		return deliveryManagerJpaRepository.findByDeliveryManagerIdAndDeletedAtIsNull(managerId);
+	}
 
-    @Override
+	@Override
 	public List<DeliveryManager> findAll() {
 		return deliveryManagerJpaRepository.findAll();
 	}
@@ -55,12 +55,12 @@ public class DeliveryManagerRepositoryImpl implements DeliveryManagerRepository 
 		return deliveryManagerJpaRepository.findAllByHubId(hubId, pageable);
 	}
 
-    @Override
-    public Page<DeliveryManager> findAllByHubIdANdDeletedAtISNULL(UUID hubId, Pageable pageable) {
-        return deliveryManagerJpaRepository.findAllByHubIdAndDeletedAtIsNull(hubId, pageable);
-    }
+	@Override
+	public Page<DeliveryManager> findAllByHubIdANdDeletedAtISNULL(UUID hubId, Pageable pageable) {
+		return deliveryManagerJpaRepository.findAllByHubIdAndDeletedAtIsNull(hubId, pageable);
+	}
 
-    @Override
+	@Override
 	public Optional<DeliveryManager> findByDeliveryManagerIdAndDeletedAtIsNotNull(Long id) {
 		return deliveryManagerJpaRepository.findByDeliveryManagerIdAndDeletedAtIsNotNull(id);
 	}

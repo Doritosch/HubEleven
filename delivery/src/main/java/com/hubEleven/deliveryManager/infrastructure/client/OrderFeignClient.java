@@ -11,8 +11,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient(name = "order-service", contextId = "deliveryManager-order-client")
 public interface OrderFeignClient {
 
-    @GetMapping("/v1/orders/{orderId}")
-    ResponseEntity<ApiResponse<OrderResponse>> getOrderDetail(@PathVariable UUID orderId);
-
-
-    }
+	@GetMapping("/v1/orders/{orderId}")
+	ResponseEntity<ApiResponse<OrderResponse>> getOrderDetail(@PathVariable UUID orderId);
+}

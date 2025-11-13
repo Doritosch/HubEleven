@@ -11,11 +11,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 @FeignClient(name = "user-service", contextId = "deliveryManager-user-client")
 public interface UserFeignClient {
 
-
-    @GetMapping("/v1/user/{id}")
-    ResponseEntity<ApiResponse<UserInfoResponse>> getUser(
-        @PathVariable("id") Long id,
-        @RequestHeader("X-User-Id") Long requestUserId,
-        @RequestHeader("X-User-Role") String requestUserRole);
-
+	@GetMapping("/v1/user/{id}")
+	ResponseEntity<ApiResponse<UserInfoResponse>> getUser(
+			@PathVariable("id") Long id,
+			@RequestHeader("X-User-Id") Long requestUserId,
+			@RequestHeader("X-User-Role") String requestUserRole);
 }

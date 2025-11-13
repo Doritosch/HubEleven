@@ -40,25 +40,27 @@ public class DeliveryManagerController {
 		this.deliveryManagerService = deliveryManagerService;
 	}
 
-    //@PreAuthorize("hasAnyRole('MASTER','HUB_MANAGER')")
+	// @PreAuthorize("hasAnyRole('MASTER','HUB_MANAGER')")
 	@Operation(summary = "배송 담당자 생성 API", description = "새로운 배송담당자를 생성한다.")
 	@PostMapping
 	public ResponseEntity<ApiResponse<DeliveryManagerResponseDto>> createDeliveryManager(
 			@RequestBody @Valid DeliveryManagerCreateRequestDto createRequestDto
-//        @RequestHeader("X-User-Id") Long requestUserId,
-//        @RequestHeader("X-User-Role") String requestUserRole
-    ) {
+			//        @RequestHeader("X-User-Id") Long requestUserId,
+			//        @RequestHeader("X-User-Role") String requestUserRole
+			) {
 
-        log.info("[DeliveryManager Controller] 배달 담당자 생성 요청");
-       // log.info("[DeliveryManager Controller] 헤더 정보 확인 - ID : {}, role : {}", requestUserId.toString() , requestUserRole);
+		log.info("[DeliveryManager Controller] 배달 담당자 생성 요청");
+		// log.info("[DeliveryManager Controller] 헤더 정보 확인 - ID : {}, role : {}",
+		// requestUserId.toString() , requestUserRole);
 		DeliveryManagerResponseDto responseDto =
-				deliveryManagerService.createDeliveryManager(createRequestDto /* , requestUserId, requestUserRole */);
+				deliveryManagerService.createDeliveryManager(
+						createRequestDto /* , requestUserId, requestUserRole */);
 
 		return ApiResponseEntity.success(responseDto);
 	}
 
-    //@PreAuthorize("hasAnyRole('MASTER','HUB_MANAGER')")
-    @Operation(summary = "배송 담당자 목록 조회 API", description = "전체 배송담당자 목록을 조회한다.")
+	// @PreAuthorize("hasAnyRole('MASTER','HUB_MANAGER')")
+	@Operation(summary = "배송 담당자 목록 조회 API", description = "전체 배송담당자 목록을 조회한다.")
 	@GetMapping
 	public ResponseEntity<ApiResponse<CommonPageResponse<DeliveryManagerResponseDto>>>
 			getAllDeliveryManager(
@@ -79,8 +81,8 @@ public class DeliveryManagerController {
 		return ApiResponseEntity.success(responseDtoList);
 	}
 
-    //@PreAuthorize("hasAnyRole('MASTER','HUB_MANAGER', 'DELIVERY_MANAGER')")
-    @Operation(summary = "배송 담당자 단일 조회 API", description = "특정 배송담당자를 조회한다.")
+	// @PreAuthorize("hasAnyRole('MASTER','HUB_MANAGER', 'DELIVERY_MANAGER')")
+	@Operation(summary = "배송 담당자 단일 조회 API", description = "특정 배송담당자를 조회한다.")
 	@GetMapping("/{managerId}")
 	public ResponseEntity<ApiResponse<DeliveryManagerResponseDto>> getDeliveryManager(
 			@PathVariable Long managerId) {
@@ -89,16 +91,16 @@ public class DeliveryManagerController {
 		return ApiResponseEntity.success(responseDto);
 	}
 
-    //@PreAuthorize("hasAnyRole('MASTER','HUB_MANAGER')")
-    @Operation(summary = "배송 담당자 삭제 API", description = "배송 담당자를 삭제한다.")
+	// @PreAuthorize("hasAnyRole('MASTER','HUB_MANAGER')")
+	@Operation(summary = "배송 담당자 삭제 API", description = "배송 담당자를 삭제한다.")
 	@DeleteMapping("/{managerId}")
 	public ResponseEntity<ApiResponse<Void>> deleteDeliveryManager(@PathVariable Long managerId) {
 		deliveryManagerService.deleteDeliveryManager(managerId);
 		return ApiResponseEntity.ok("삭제가 완료되었습니다.");
 	}
 
-    //@PreAuthorize("hasAnyRole('MASTER')")
-    @Operation(summary = "배송 담당자 배정 API", description = "특정 배송경로에 대한 배송 담당자를 배정한다.")
+	// @PreAuthorize("hasAnyRole('MASTER')")
+	@Operation(summary = "배송 담당자 배정 API", description = "특정 배송경로에 대한 배송 담당자를 배정한다.")
 	@PatchMapping("/assign")
 	public ResponseEntity<DeliveryManagerAssignResponseDto> assignDeliveryManager(
 			@RequestBody @Valid DeliveryManagerAssignRequestDto assignRequestDto) {
@@ -124,8 +126,8 @@ public class DeliveryManagerController {
 	}
 
 	// search
-    //@PreAuthorize("hasAnyRole('MASTER','HUB_MANAGER', 'DELIVERY_MANAGER)")
-    @GetMapping("/search")
+	// @PreAuthorize("hasAnyRole('MASTER','HUB_MANAGER', 'DELIVERY_MANAGER)")
+	@GetMapping("/search")
 	public ResponseEntity<ApiResponse<CommonPageResponse<DeliveryManagerResponseDto>>>
 			searchDeliveryManagers(
 					@RequestParam(required = false) UUID deliveryManagerId,

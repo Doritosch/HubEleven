@@ -38,46 +38,50 @@ public class DeliveryManagerService {
 
 	private final DeliveryManagerRepository deliveryManagerRepository;
 	private final HubService hubService;
-    private final UserService userService;
-    private final OrderService orderService;
+	private final UserService userService;
+	private final OrderService orderService;
 
 	public DeliveryManagerService(
-			DeliveryManagerRepository deliveryManagerRepository, HubService hubService, UserService userService, OrderService orderService) {
+			DeliveryManagerRepository deliveryManagerRepository,
+			HubService hubService,
+			UserService userService,
+			OrderService orderService) {
 		this.deliveryManagerRepository = deliveryManagerRepository;
 		this.hubService = hubService;
-        this.userService = userService;
-        this.orderService = orderService;
+		this.userService = userService;
+		this.orderService = orderService;
 	}
 
 	@Transactional
 	public DeliveryManagerResponseDto createDeliveryManager(
-			DeliveryManagerCreateRequestDto createRequestDto /*, Long requestUserId, String requestUserRole */ ) {
+			DeliveryManagerCreateRequestDto
+					createRequestDto /*, Long requestUserId, String requestUserRole */) {
 
-        log.info("[DeliveryManager Service] 배송담당자 생성 요청 서비스 진입");
+		log.info("[DeliveryManager Service] 배송담당자 생성 요청 서비스 진입");
 
-        //임시---------------------------------------------------------------------------
-            //로그인한 유저 정보
-            Long requestUserId = 1L; //id
-            String requestUserRole = "MASTER"; //role
-            UUID companyId = UUID.randomUUID();  //소속ID
+		// 임시---------------------------------------------------------------------------
+		// 로그인한 유저 정보
+		Long requestUserId = 1L; // id
+		String requestUserRole = "MASTER"; // role
+		UUID companyId = UUID.randomUUID(); // 소속ID
 
-            //생성할 유저 정보
-            Long id = createRequestDto.deliveryManagerId(); //생성 요청 id
-            //UserInfoResponse response = userService.getUser(id,requestUserId, requestUserRole);
+		// 생성할 유저 정보
+		Long id = createRequestDto.deliveryManagerId(); // 생성 요청 id
+		// UserInfoResponse response = userService.getUser(id,requestUserId, requestUserRole);
 
-            //log.info("feignClient - Usr 통신 정보 : {} ", String.valueOf(response.userId()));
+		// log.info("feignClient - Usr 통신 정보 : {} ", String.valueOf(response.userId()));
 
-            //feignClient로 받아온 유저정보 가정
-            UUID hubId = UUID.fromString("97eb5e60-beee-11f0-adaf-c6cdb3175b81");
-            String slackId = "slack001";
-            DeliveryType deliveryType = DeliveryType.COMPANY;
-        //-------------------------------------------------------------------------------
+		// feignClient로 받아온 유저정보 가정
+		UUID hubId = UUID.fromString("97eb5e60-beee-11f0-adaf-c6cdb3175b81");
+		String slackId = "slack001";
+		DeliveryType deliveryType = DeliveryType.COMPANY;
+		// -------------------------------------------------------------------------------
 
-        //로그인한 유저가 허브매니저일 때 유저정보에서 이 유저의 소속 업체 가져와 권한이 있는지 확인
-            //로그인한 유저 정보
-        if( requestUserRole == "HUB_MANAGER" && companyId != hubId) {
-            throw new GlobalException(ACCESS_DENIED);
-        }
+		// 로그인한 유저가 허브매니저일 때 유저정보에서 이 유저의 소속 업체 가져와 권한이 있는지 확인
+		// 로그인한 유저 정보
+		if (requestUserRole == "HUB_MANAGER" && companyId != hubId) {
+			throw new GlobalException(ACCESS_DENIED);
+		}
 
 		if (checkDeliveryManagerExists(id)) {
 			throw new GlobalException(DeliveryManagerErrorCode.DUPLICATE_DELIVERY_MANAGER);
@@ -127,8 +131,8 @@ public class DeliveryManagerService {
 
 		// if 권한=HubManager
 		// 유저조회해서 담당 hubID 가져오기
-		//Page<DeliveryManager> hubDeliveryManagerList = deliveryManagerRepository.findAllByHubIdANdDeletedAtISNULL(hubId);
-
+		// Page<DeliveryManager> hubDeliveryManagerList =
+		// deliveryManagerRepository.findAllByHubIdANdDeletedAtISNULL(hubId);
 
 		return deliveryManagerList.map(DeliveryManagerResponseDto::from);
 	}
@@ -136,15 +140,17 @@ public class DeliveryManagerService {
 	@Transactional(readOnly = true)
 	public DeliveryManagerResponseDto getDeliveryManager(Long managerId) {
 
-        Optional<DeliveryManager> deliveryManager;
-        //MASTER
+		Optional<DeliveryManager> deliveryManager;
+		// MASTER
 		deliveryManager = deliveryManagerRepository.findById(managerId);
 
 		// TODO: 허브담당자 (유저에서 소속업체 id가져와서 조건걸어서 조회)
-        //deliveryManager = deliveryManagerRepository.findByDeliveryManagerIdAndDeletedAtIsNull(managerId);
+		// deliveryManager =
+		// deliveryManagerRepository.findByDeliveryManagerIdAndDeletedAtIsNull(managerId);
 
-        // TODO: 본인(로그인정보에서 본인id 로 조회)
-        //deliveryManager = deliveryManagerRepository.findByDeliveryManagerIdAndDeletedAtIsNull(managerId);
+		// TODO: 본인(로그인정보에서 본인id 로 조회)
+		// deliveryManager =
+		// deliveryManagerRepository.findByDeliveryManagerIdAndDeletedAtIsNull(managerId);
 
 		return deliveryManager
 				.map(DeliveryManagerResponseDto::from)
@@ -156,14 +162,15 @@ public class DeliveryManagerService {
 		// TODO: 삭제권한 검증 - 마스터는 전부삭제가능, 허브매니저는 본인 허브 배송담당자만 삭제 가능
 		DeliveryManager deliveryManager;
 
-        //if MASTER
-		deliveryManager = deliveryManagerRepository
+		// if MASTER
+		deliveryManager =
+				deliveryManagerRepository
 						.findById(managerId)
 						.orElseThrow(() -> new GlobalException(DELIVERY_MANAGER_NOT_FOUND));
 
-        //if HUB_MANAGER
-        //로그인한 사용자 정보를 user에서 받아와서 companyId(소속정보) 확인
-        //if(!deliveryManager.getHubId().equals(companyId)) throw new GlobalException(ACCESS_DENIED);
+		// if HUB_MANAGER
+		// 로그인한 사용자 정보를 user에서 받아와서 companyId(소속정보) 확인
+		// if(!deliveryManager.getHubId().equals(companyId)) throw new GlobalException(ACCESS_DENIED);
 
 		// 이미삭제된 데이터먼 에러발생
 		if (deliveryManagerRepository
@@ -175,7 +182,7 @@ public class DeliveryManagerService {
 		// 임시 데이터
 		Long deletedBy = 1L;
 
-        deliveryManager.delete(deletedBy);
+		deliveryManager.delete(deletedBy);
 
 		deliveryManagerRepository.save(deliveryManager);
 	}
@@ -200,9 +207,9 @@ public class DeliveryManagerService {
 
 		// TODO: 해당 주문이 실제존재하는직 검증
 		UUID orderId = assignRequestDto.orderId();
-        OrderResponse orderResponse = orderService.getOrder(orderId);
+		OrderResponse orderResponse = orderService.getOrder(orderId);
 
-        log.info(orderResponse.recipientCompanyId().toString());
+		log.info(orderResponse.recipientCompanyId().toString());
 		return DeliveryManagerAssignResponseDto.of(orderId, deliveryManager);
 	}
 

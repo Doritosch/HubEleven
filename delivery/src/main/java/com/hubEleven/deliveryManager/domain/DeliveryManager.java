@@ -63,5 +63,4 @@ public class DeliveryManager extends BaseEntity {
 	public void recordDeliveryTime() {
 		this.lastDeliveryTime = LocalDateTime.now();
 	}
-
 }
