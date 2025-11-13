@@ -17,6 +17,8 @@ import com.hubEleven.notification.slack.domain.model.SlackMessageStatus;
 import com.hubEleven.notification.slack.domain.repository.SlackMessageRepository;
 import com.hubEleven.notification.slack.domain.service.SlackMessageDomainService;
 import com.hubEleven.notification.slack.infrastructure.client.SlackWebhookClient;
+import com.hubEleven.notification.slack.infrastructure.security.AuthUser;
+import com.hubEleven.notification.slack.infrastructure.security.Role;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +39,8 @@ public class SlackMessageAppService {
 	private final ObjectMapper objectMapper;
 
 	@Transactional
-	public SlackMessageResponse createMessage(SlackMessageCreateRequest request) {
+	public SlackMessageResponse createMessage(AuthUser authUser, SlackMessageCreateRequest request) {
+		assertCreateAccess(authUser);
 
 		slackMessageRepository
 				.findFirstByOrderIdAndStatus(request.orderId(), SlackMessageStatus.SENT)
@@ -46,10 +49,7 @@ public class SlackMessageAppService {
 							throw new GlobalException(SlackMessageErrorCode.SLACK_MESSAGE_ALREADY_SENT);
 						});
 
-		// Long currentUserId = getCurrentUserId();
-
 		MessageGenerationResponse aiResponse = findAiResultOrThrow(request.orderId());
-
 		String formattedMessage = slackMessageDomainService.formatMessage(request, aiResponse);
 
 		SlackMessage slackMessage =
@@ -57,14 +57,16 @@ public class SlackMessageAppService {
 						request.orderId(), request.recipientId(), request.channel(), formattedMessage);
 
 		SlackMessage savedSlackMessage = slackMessageRepository.save(slackMessage);
-
 		sendToSlackAsync(savedSlackMessage.getId(), formattedMessage);
 
 		return SlackMessageResponse.from(savedSlackMessage);
 	}
 
 	@Transactional
-	public SlackMessageResponse updateMessage(UUID messageId, SlackMessageUpdateRequest request) {
+	public SlackMessageResponse updateMessage(
+			AuthUser authUser, UUID messageId, SlackMessageUpdateRequest request) {
+		assertUpdateAccess(authUser);
+
 		SlackMessage slackMessage =
 				slackMessageRepository
 						.findById(messageId)
@@ -77,34 +79,36 @@ public class SlackMessageAppService {
 	}
 
 	@Transactional
-	public void deleteMessage(UUID messageId) {
-		// Long currentUserId = getCurrentUserId();
+	public void deleteMessage(AuthUser authUser, UUID messageId) {
+		assertDeleteAccess(authUser);
 
 		SlackMessage slackMessage =
 				slackMessageRepository
 						.findById(messageId)
 						.orElseThrow(() -> new GlobalException(SlackMessageErrorCode.SLACK_MESSAGE_NOT_FOUND));
 
-		// slackMessage.delete(currentUserId);
-		slackMessage.delete(null);
+		slackMessage.delete(authUser.userId());
 		slackMessageRepository.save(slackMessage);
 	}
 
-	public SlackMessageResponse getMessage(UUID messageId) {
+	public SlackMessageResponse getMessage(AuthUser authUser, UUID messageId) {
+		assertReadAccess(authUser);
+
 		SlackMessage slackMessage =
 				slackMessageRepository
 						.findById(messageId)
 						.orElseThrow(() -> new GlobalException(SlackMessageErrorCode.SLACK_MESSAGE_NOT_FOUND));
-
 		return SlackMessageResponse.from(slackMessage);
 	}
 
 	public CommonPageResponse<SlackMessageResponse> searchMessages(
+			AuthUser authUser,
 			SlackMessageStatus status,
 			String channel,
 			LocalDateTime dateFrom,
 			LocalDateTime dateTo,
 			CommonPageRequest pageReq) {
+		assertReadAccess(authUser);
 
 		var page =
 				slackMessageRepository.search(status, channel, dateFrom, dateTo, pageReq.toPageable());
@@ -112,12 +116,12 @@ public class SlackMessageAppService {
 	}
 
 	private MessageGenerationResponse findAiResultOrThrow(UUID orderId) {
-		var log =
+		var logEntry =
 				aiRequestLogRepository
 						.findByOrderId(orderId)
 						.orElseThrow(() -> new GlobalException(NotificationErrorCode.AI_RESPONSE_PARSE_FAIL));
 
-		String raw = log.getRawResponse();
+		String raw = logEntry.getRawResponse();
 		String cleaned = cleanJsonResponse(raw);
 
 		try {
@@ -138,15 +142,10 @@ public class SlackMessageAppService {
 	private String cleanJsonResponse(String rawJson) {
 		if (rawJson == null || rawJson.isBlank()) return rawJson;
 		String cleaned = rawJson.trim();
-		if (cleaned.startsWith("```json")) cleaned = cleaned.substring(7);
+		if (cleaned.startsWith("")) cleaned = cleaned.substring(7);
 		else if (cleaned.startsWith("```")) cleaned = cleaned.substring(3);
 		if (cleaned.endsWith("```")) cleaned = cleaned.substring(0, cleaned.length() - 3);
 		return cleaned.trim();
-	}
-
-	private static final class ResponsePayload {
-		public String finalDispatchDeadline;
-		public String messageBody;
 	}
 
 	private void sendToSlackAsync(UUID messageId, String messageText) {
@@ -185,9 +184,37 @@ public class SlackMessageAppService {
 						});
 	}
 
-	private Long getCurrentUserId() {
-		// 권한 로직 제거로 인해 임시로 null 반환
-		// TODO: 필요시 다른 방식으로 사용자 ID를 가져오도록 수정
-		return null;
+	private void assertCreateAccess(AuthUser authUser) {
+		requireAuthenticated(authUser);
+	}
+
+	private void assertUpdateAccess(AuthUser authUser) {
+		requireRole(authUser, Role.MASTER);
+	}
+
+	private void assertDeleteAccess(AuthUser authUser) {
+		requireRole(authUser, Role.MASTER);
+	}
+
+	private void assertReadAccess(AuthUser authUser) {
+		requireRole(authUser, Role.MASTER);
+	}
+
+	private void requireAuthenticated(AuthUser authUser) {
+		if (authUser == null) {
+			throw new GlobalException(SlackMessageErrorCode.UNAUTHORIZED);
+		}
+	}
+
+	private void requireRole(AuthUser authUser, Role requiredRole) {
+		requireAuthenticated(authUser);
+		if (authUser.role() != requiredRole) {
+			throw new GlobalException(SlackMessageErrorCode.FORBIDDEN);
+		}
+	}
+
+	private static final class ResponsePayload {
+		public String finalDispatchDeadline;
+		public String messageBody;
 	}
 }
