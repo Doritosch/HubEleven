@@ -13,6 +13,9 @@ import com.hubEleven.hub.infrastructure.client.KakaoApiClient;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,12 +32,8 @@ public class HubServiceImpl implements HubService {
 		this.kakaoApiClient = kakaoApiClient;
 	}
 
-	/*
-	 *  1. 감사 로그 전체적으로 수정
-	 *  2. Hub 위치 정보 수정 시 허브 경로 재배치
-	 *  3. createdBy/updatedBy/deletedBy를 Gateway 완성 후 받아오기
-	 * */
 	@Override
+	@CacheEvict(value = "hub-list", allEntries = true)
 	public HubResult createHub(CreateHubCommand command) {
 
 		validateDuplicateName(command.name());
@@ -66,6 +65,8 @@ public class HubServiceImpl implements HubService {
 	}
 
 	@Override
+	@CachePut(value = "hubs", key = "#command.hubId")
+	@CacheEvict(value = "hub-list", allEntries = true)
 	public HubResult updateHub(UpdateHubCommand command) {
 		UUID hubId = command.hubId();
 		Hub hub = findHubById(hubId);
@@ -91,6 +92,9 @@ public class HubServiceImpl implements HubService {
 	}
 
 	@Override
+	@CacheEvict(
+			value = {"hubs", "hub-list"},
+			key = "#command.hubId")
 	public void deleteHub(DeleteHubCommand command) {
 		UUID hubId = command.hubId();
 		Hub hub = findHubById(hubId);
@@ -102,6 +106,7 @@ public class HubServiceImpl implements HubService {
 	}
 
 	@Override
+	@Cacheable(value = "hubs", key = "#hubId")
 	@Transactional(readOnly = true)
 	public HubResult getHub(UUID hubId) {
 		Hub hub = findHubById(hubId);
@@ -109,6 +114,7 @@ public class HubServiceImpl implements HubService {
 	}
 
 	@Override
+	@Cacheable(value = "hub-list")
 	@Transactional(readOnly = true)
 	public HubListResult getHubs() {
 		List<Hub> hubs = hubRepository.findAllNotDeleted();
