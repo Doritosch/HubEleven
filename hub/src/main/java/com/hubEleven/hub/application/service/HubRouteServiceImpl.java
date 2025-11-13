@@ -32,7 +32,7 @@ public class HubRouteServiceImpl implements HubRouteService {
 	@Override
 	@Transactional
 	@CacheEvict(value = "hub-routes", allEntries = true)
-	public void generateAllRoutes() {
+	public void generateAllRoutes(Long userId) {
 		log.info("모든 허브 경로 생성 시작");
 
 		List<Hub> allHubs = hubRepository.findAllNotDeleted();
@@ -65,7 +65,7 @@ public class HubRouteServiceImpl implements HubRouteService {
 							routeCalculator.calculate(fromHub.getHubId(), toHub.getHubId(), allHubs);
 
 					// Segment 생성
-					List<HubRouteSegment> segments = createSegments(calculationResult);
+					List<HubRouteSegment> segments = createSegments(calculationResult, userId);
 
 					// 총 소요시간 계산
 					Integer totalDuration =
@@ -121,12 +121,11 @@ public class HubRouteServiceImpl implements HubRouteService {
 		return RouteResult.from(hubRoute);
 	}
 
-	private List<HubRouteSegment> createSegments(RouteCalculationResult calculationResult) {
+	private List<HubRouteSegment> createSegments(
+			RouteCalculationResult calculationResult, Long userId) {
 		List<HubRouteSegment> segments = new ArrayList<>();
 		List<UUID> path = calculationResult.path();
 		List<Double> distances = calculationResult.segmentDistances();
-
-		Long createdBy = 1L; // 임시값
 
 		for (int i = 0; i < distances.size(); i++) {
 			UUID fromHubId = path.get(i);
@@ -135,7 +134,7 @@ public class HubRouteServiceImpl implements HubRouteService {
 			Integer duration = routeCalculator.calculateDuration(distance);
 
 			HubRouteSegment segment =
-					HubRouteSegment.create(fromHubId, toHubId, i + 1, distance, duration, createdBy);
+					HubRouteSegment.create(fromHubId, toHubId, i + 1, distance, duration, userId);
 
 			segments.add(segment);
 		}
