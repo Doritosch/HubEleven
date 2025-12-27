@@ -12,12 +12,10 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(
 		name = "p_ai_request_log",
-		uniqueConstraints = {
-				@UniqueConstraint(name = "uk_ai_req_order", columnNames = "order_id")
-		},
+		uniqueConstraints = {@UniqueConstraint(name = "uk_ai_req_order", columnNames = "order_id")},
 		indexes = {
-				@Index(name = "idx_ai_req_order", columnList = "order_id"),
-				@Index(name = "idx_ai_req_status", columnList = "request_status")
+			@Index(name = "idx_ai_req_order", columnList = "order_id"),
+			@Index(name = "idx_ai_req_status", columnList = "request_status")
 		})
 @SoftDeletable
 @NoArgsConstructor
@@ -65,7 +63,8 @@ public class AiRequestLog extends BaseEntity {
 		return new AiRequestLog(orderId, RequestStatus.REQUESTED, prompt, metadataJson);
 	}
 
-	public AiRequestLog success(String finalDispatchDeadline, String messageBody, String rawResponse, String metadataJson) {
+	public AiRequestLog success(
+			String finalDispatchDeadline, String messageBody, String rawResponse, String metadataJson) {
 		this.status = RequestStatus.SUCCESS;
 		this.finalDispatchDeadline = finalDispatchDeadline;
 		this.messageBody = messageBody;

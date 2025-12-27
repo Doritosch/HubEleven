@@ -2,17 +2,16 @@ package com.hubEleven.notification.ai.application.service.impl;
 
 import com.commonLib.common.exception.GlobalException;
 import com.hubEleven.notification.ai.application.service.AiService;
-import com.hubEleven.notification.ai.exception.NotificationErrorCode;
 import com.hubEleven.notification.ai.domain.model.AiRequestLog;
 import com.hubEleven.notification.ai.domain.repository.AiRequestLogRepository;
+import com.hubEleven.notification.ai.exception.NotificationErrorCode;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.UUID;
 
 @Slf4j
 @Service
@@ -34,9 +33,16 @@ public class AiServiceImpl implements AiService {
 
 	@Override
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public void markSuccess(UUID logId, String finalDispatchDeadline, String messageBody, String rawResponse, String metadataText) {
-		AiRequestLog log = aiRequestLogRepository.findById(logId)
-				.orElseThrow(() -> new GlobalException(NotificationErrorCode.AI_GENERATION_FAIL));
+	public void markSuccess(
+			UUID logId,
+			String finalDispatchDeadline,
+			String messageBody,
+			String rawResponse,
+			String metadataText) {
+		AiRequestLog log =
+				aiRequestLogRepository
+						.findById(logId)
+						.orElseThrow(() -> new GlobalException(NotificationErrorCode.AI_GENERATION_FAIL));
 
 		log.success(finalDispatchDeadline, messageBody, rawResponse, metadataText);
 		aiRequestLogRepository.save(log);
@@ -45,8 +51,10 @@ public class AiServiceImpl implements AiService {
 	@Override
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void markFail(UUID logId, String failureReason, String metadataText) {
-		AiRequestLog log = aiRequestLogRepository.findById(logId)
-				.orElseThrow(() -> new GlobalException(NotificationErrorCode.AI_GENERATION_FAIL));
+		AiRequestLog log =
+				aiRequestLogRepository
+						.findById(logId)
+						.orElseThrow(() -> new GlobalException(NotificationErrorCode.AI_GENERATION_FAIL));
 
 		log.fail(failureReason, metadataText);
 		aiRequestLogRepository.save(log);

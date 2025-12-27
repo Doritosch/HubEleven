@@ -26,25 +26,44 @@ public class GeminiClient {
 
 		return geminiWebClient
 				.post()
-				.uri(uriBuilder -> uriBuilder
-						.path("/v1beta/models/{model}:generateContent")
-						.queryParam("key", apiKey)
-						.build(model))
+				.uri(
+						uriBuilder ->
+								uriBuilder
+										.path("/v1beta/models/{model}:generateContent")
+										.queryParam("key", apiKey)
+										.build(model))
 				.contentType(MediaType.APPLICATION_JSON)
 				.bodyValue(body)
 				.retrieve()
-				.onStatus(s -> s.value() == 400,
-						resp -> resp.bodyToMono(String.class)
-								.flatMap(msg -> Mono.error(new GlobalException(NotificationErrorCode.AI_BAD_REQUEST))))
-				.onStatus(s -> s.value() == 429,
-						resp -> resp.bodyToMono(String.class)
-								.flatMap(msg -> Mono.error(new GlobalException(NotificationErrorCode.AI_RATE_LIMITED))))
-				.onStatus(HttpStatusCode::is5xxServerError,
-						resp -> resp.bodyToMono(String.class)
-								.flatMap(msg -> Mono.error(new GlobalException(NotificationErrorCode.AI_UPSTREAM_UNAVAILABLE))))
+				.onStatus(
+						s -> s.value() == 400,
+						resp ->
+								resp.bodyToMono(String.class)
+										.flatMap(
+												msg ->
+														Mono.error(new GlobalException(NotificationErrorCode.AI_BAD_REQUEST))))
+				.onStatus(
+						s -> s.value() == 429,
+						resp ->
+								resp.bodyToMono(String.class)
+										.flatMap(
+												msg ->
+														Mono.error(new GlobalException(NotificationErrorCode.AI_RATE_LIMITED))))
+				.onStatus(
+						HttpStatusCode::is5xxServerError,
+						resp ->
+								resp.bodyToMono(String.class)
+										.flatMap(
+												msg ->
+														Mono.error(
+																new GlobalException(
+																		NotificationErrorCode.AI_UPSTREAM_UNAVAILABLE))))
 				.bodyToMono(GeminiResponse.class)
-				.onErrorMap(ex -> (ex instanceof GlobalException) ? ex
-						: new GlobalException(NotificationErrorCode.AI_UPSTREAM_UNAVAILABLE))
+				.onErrorMap(
+						ex ->
+								(ex instanceof GlobalException)
+										? ex
+										: new GlobalException(NotificationErrorCode.AI_UPSTREAM_UNAVAILABLE))
 				.blockOptional()
 				.orElseThrow(() -> new GlobalException(NotificationErrorCode.AI_UPSTREAM_UNAVAILABLE));
 	}

@@ -3,7 +3,6 @@ package com.hubEleven.notification.ai.presentation.dto.request;
 import com.hubEleven.notification.ai.application.command.GenerateDispatchCommand;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -21,8 +20,7 @@ public record GenerateMessageRequest(
 		@Size(max = 1000) String requestNote,
 		@NotBlank String deliveryManagerName,
 		@Email String deliveryManagerEmail,
-		@NotEmpty @Valid List<Item> items
-) {
+		@NotEmpty @Valid List<Item> items) {
 	public GenerateDispatchCommand toCommand() {
 		List<GenerateDispatchCommand.Item> mapped =
 				items.stream()
@@ -42,13 +40,11 @@ public record GenerateMessageRequest(
 				requestNote,
 				deliveryManagerName,
 				deliveryManagerEmail,
-				mapped
-		);
+				mapped);
 	}
 
 	public record Item(
 			@NotBlank @Size(max = 200) String name,
 			@Positive int quantity,
-			@Size(max = 500) String note
-	) {}
+			@Size(max = 500) String note) {}
 }

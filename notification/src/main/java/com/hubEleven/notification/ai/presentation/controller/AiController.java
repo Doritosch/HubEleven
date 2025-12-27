@@ -22,12 +22,10 @@ public class AiController {
 
 	@Operation(
 			summary = "Ai 배송 안내 메시지 생성 API",
-			description = "주문/경로/담당자 정보를 바탕으로 Gemini로 최종 발송 시한과 Slack 메시지 내용을 생성한다."
-	)
+			description = "주문/경로/담당자 정보를 바탕으로 Gemini로 최종 발송 시한과 Slack 메시지 내용을 생성한다.")
 	@PostMapping("/messages")
 	public ResponseEntity<ApiResponse<GenerateMessageResponse>> generateMessage(
-			@Valid @RequestBody GenerateMessageRequest request
-	) {
+			@Valid @RequestBody GenerateMessageRequest request) {
 		GenerateMessageResponse response = generateDispatchService.generate(request.toCommand());
 		return ApiResponseEntity.success(response);
 	}

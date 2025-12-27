@@ -17,16 +17,19 @@ public record GeminiResponse(List<Candidate> candidates) {
 		Optional<String> text =
 				candidates.stream()
 						.findFirst()
-						.flatMap(c -> {
-							Content content = c.content();
-							if (content == null || content.parts() == null || content.parts().isEmpty()) return Optional.empty();
-							return content.parts().stream()
-									.map(Part::text)
-									.filter(t -> t != null && !t.isBlank())
-									.findFirst();
-						});
+						.flatMap(
+								c -> {
+									Content content = c.content();
+									if (content == null || content.parts() == null || content.parts().isEmpty())
+										return Optional.empty();
+									return content.parts().stream()
+											.map(Part::text)
+											.filter(t -> t != null && !t.isBlank())
+											.findFirst();
+								});
 
-		return text.orElseThrow(() -> new GlobalException(NotificationErrorCode.AI_RESPONSE_PARSE_FAIL));
+		return text.orElseThrow(
+				() -> new GlobalException(NotificationErrorCode.AI_RESPONSE_PARSE_FAIL));
 	}
 
 	@JsonIgnoreProperties(ignoreUnknown = true)
