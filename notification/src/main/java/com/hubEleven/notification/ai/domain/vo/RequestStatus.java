@@ -1,4 +1,4 @@
-package com.hubEleven.notification.ai.domain.entity;
+package com.hubEleven.notification.ai.domain.vo;
 
 import lombok.Getter;
 

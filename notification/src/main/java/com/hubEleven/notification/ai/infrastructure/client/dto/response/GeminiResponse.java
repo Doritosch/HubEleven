@@ -1,9 +1,10 @@
-package com.hubEleven.notification.ai.infrastructure.client.dto;
+package com.hubEleven.notification.ai.infrastructure.client.dto.response;
 
 import com.commonLib.common.exception.GlobalException;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.hubEleven.notification.ai.domain.exception.NotificationErrorCode;
+import com.hubEleven.notification.ai.exception.NotificationErrorCode;
 import java.util.List;
+import java.util.Optional;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record GeminiResponse(List<Candidate> candidates) {
@@ -13,20 +14,19 @@ public record GeminiResponse(List<Candidate> candidates) {
 			throw new GlobalException(NotificationErrorCode.AI_RESPONSE_PARSE_FAIL);
 		}
 
-		return candidates.stream()
-				.findFirst()
-				.flatMap(
-						candidate -> {
-							Content content = candidate.content();
-							if (content == null || content.parts() == null || content.parts().isEmpty()) {
-								return java.util.Optional.empty();
-							}
+		Optional<String> text =
+				candidates.stream()
+						.findFirst()
+						.flatMap(c -> {
+							Content content = c.content();
+							if (content == null || content.parts() == null || content.parts().isEmpty()) return Optional.empty();
 							return content.parts().stream()
 									.map(Part::text)
-									.filter(text -> text != null && !text.isBlank())
+									.filter(t -> t != null && !t.isBlank())
 									.findFirst();
-						})
-				.orElseThrow(() -> new GlobalException(NotificationErrorCode.AI_RESPONSE_PARSE_FAIL));
+						});
+
+		return text.orElseThrow(() -> new GlobalException(NotificationErrorCode.AI_RESPONSE_PARSE_FAIL));
 	}
 
 	@JsonIgnoreProperties(ignoreUnknown = true)
