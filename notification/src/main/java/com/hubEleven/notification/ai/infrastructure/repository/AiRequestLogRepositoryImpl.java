@@ -1,6 +1,6 @@
 package com.hubEleven.notification.ai.infrastructure.repository;
 
-import com.hubEleven.notification.ai.domain.model.AiRequestLog;
+import com.hubEleven.notification.ai.domain.entity.AiRequestLog;
 import com.hubEleven.notification.ai.domain.repository.AiRequestLogRepository;
 import java.util.Optional;
 import java.util.UUID;

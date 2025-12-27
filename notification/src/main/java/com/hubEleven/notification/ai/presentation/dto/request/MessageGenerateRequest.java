@@ -1,4 +1,4 @@
-package com.hubEleven.notification.ai.presentation.request;
+package com.hubEleven.notification.ai.presentation.dto.request;
 
 import com.hubEleven.notification.ai.application.dto.MessageGenerationRequest;
 import jakarta.validation.Valid;

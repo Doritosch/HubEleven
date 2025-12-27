@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hubEleven.notification.ai.application.dto.MessageGenerationRequest;
 import com.hubEleven.notification.ai.application.dto.MessageGenerationResponse;
 import com.hubEleven.notification.ai.domain.exception.NotificationErrorCode;
-import com.hubEleven.notification.ai.domain.model.AiRequestLog;
+import com.hubEleven.notification.ai.domain.entity.AiRequestLog;
 import com.hubEleven.notification.ai.domain.repository.AiRequestLogRepository;
 import com.hubEleven.notification.ai.domain.service.PromptDomainService;
 import com.hubEleven.notification.ai.infrastructure.client.GeminiClient;

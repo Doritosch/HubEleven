@@ -4,7 +4,7 @@ import com.commonLib.common.response.ApiResponse;
 import com.commonLib.common.response.ApiResponseEntity;
 import com.hubEleven.notification.ai.application.dto.MessageGenerationResponse;
 import com.hubEleven.notification.ai.application.service.AiAppService;
-import com.hubEleven.notification.ai.presentation.request.MessageGenerateRequest;
+import com.hubEleven.notification.ai.presentation.dto.request.MessageGenerateRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

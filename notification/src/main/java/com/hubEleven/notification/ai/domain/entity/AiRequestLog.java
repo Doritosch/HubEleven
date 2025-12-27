@@ -1,4 +1,4 @@
-package com.hubEleven.notification.ai.domain.model;
+package com.hubEleven.notification.ai.domain.entity;
 
 import com.commonLib.common.annotation.SoftDeletable;
 import com.commonLib.common.model.BaseEntity;
