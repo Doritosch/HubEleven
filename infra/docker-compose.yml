@@ -1,0 +1,132 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: mysql-hubeleven
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      TZ: Asia/Seoul
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init:/docker-entrypoint-initdb.d
+    restart: always
+    networks:
+      - hubeleven-network
+
+  redis:
+    image: redis:7.2
+    container_name: redis-hubeleven
+    ports:
+      - "6379:6379"
+    restart: always
+    volumes:
+      - redis_data:/data
+    networks:
+      - hubeleven-network
+
+  redis-insight:
+    image: redis/redisinsight:latest
+    container_name: redisinsight-hubeleven
+    ports:
+      - "5540:5540"
+    restart: always
+    networks:
+      - hubeleven-network
+
+  zookeeper:
+    image: wurstmeister/zookeeper:latest
+    platform: linux/amd64
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - hubeleven-network
+
+  kafka:
+    image: wurstmeister/kafka:latest
+    platform: linux/amd64
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka:29092,OUTSIDE://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_LISTENERS: INSIDE://0.0.0.0:29092,OUTSIDE://0.0.0.0:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - hubeleven-network
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    platform: linux/amd64
+    ports:
+      - "18080:8080"
+    depends_on:
+      - kafka
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+      KAFKA_CLUSTERS_0_READONLY: "false"
+    networks:
+      - hubeleven-network
+
+  zipkin:
+    image: openzipkin/zipkin:latest
+    platform: linux/amd64
+    ports:
+      - "9411:9411"
+    environment:
+      STORAGE_TYPE: mem
+    networks:
+      - hubeleven-network
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus-hubeleven
+    ports:
+      - "9090:9090"
+    volumes:
+      - "./monitor/prometheus.yml:/etc/prometheus/prometheus.yml"
+    restart: always
+    networks:
+      - hubeleven-network
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana-hubeleven
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    restart: always
+    networks:
+      - hubeleven-network
+
+  loki:
+    image: grafana/loki
+    container_name: loki-hubeleven
+    ports:
+      - "3100:3100"
+    volumes:
+      - "./monitor/loki.yml:/etc/loki/loki.yml"
+    restart: always
+    networks:
+      - hubeleven-network
+
+volumes:
+  mysql_data:
+  redis_data:
+
+networks:
+  hubeleven-network:
+    external: true
+    name: hubeleven-network
