@@ -1,5 +1,5 @@
 services:
-  # 데이터베이스
+  # 데이터베이스 (MySQL)
   mysql:
     image: mysql:8.4
     container_name: mysql-hubeleven
@@ -11,20 +11,20 @@ services:
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./init:/docker-entrypoint-initdb.d
-    restart: always
+      - ./init:/docker-entrypoint-initdb.d:ro
+    restart: unless-stopped
     networks:
       - hubeleven-network
 
-#Redis Cache
+  # Redis Cache
   redis:
     image: redis:7.2
     container_name: redis-hubeleven
     ports:
       - "6379:6379"
-    restart: always
     volumes:
       - redis_data:/data
+    restart: unless-stopped
     networks:
       - hubeleven-network
 
@@ -33,25 +33,28 @@ services:
     container_name: redisinsight-hubeleven
     ports:
       - "5540:5540"
-    restart: always
+    restart: unless-stopped
     networks:
       - hubeleven-network
 
-# Messaging(Kafka+Zookeeper)
+  # Messaging (Kafka + Zookeeper)
   zookeeper:
     image: wurstmeister/zookeeper:latest
     platform: linux/amd64
+    container_name: zookeeper-hubeleven
     ports:
       - "2181:2181"
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+    restart: unless-stopped
     networks:
       - hubeleven-network
 
   kafka:
     image: wurstmeister/kafka:latest
     platform: linux/amd64
+    container_name: kafka-hubeleven
     ports:
       - "9092:9092"
     depends_on:
@@ -62,14 +65,19 @@ services:
       KAFKA_LISTENERS: INSIDE://0.0.0.0:29092,OUTSIDE://0.0.0.0:9092
       KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
     networks:
       - hubeleven-network
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
     platform: linux/amd64
+    container_name: kafka-ui-hubeleven
     ports:
       - "18080:8080"
     depends_on:
@@ -79,76 +87,85 @@ services:
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
       KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
       KAFKA_CLUSTERS_0_READONLY: "false"
+    restart: unless-stopped
     networks:
       - hubeleven-network
 
-#Tracing
+  # Tracing (Zipkin)
   zipkin:
     image: openzipkin/zipkin:latest
     platform: linux/amd64
+    container_name: zipkin-hubeleven
     ports:
       - "9411:9411"
     environment:
       STORAGE_TYPE: mem
+    restart: unless-stopped
     networks:
       - hubeleven-network
 
-#Monitoring (Prometheus / Grafana / Loki)
+  # Monitoring (Prometheus / Grafana / Loki)
   prometheus:
-    image: prom/prometheus
+    image: prom/prometheus:latest
     container_name: prometheus-hubeleven
     ports:
       - "9090:9090"
     volumes:
-      - "./monitor/prometheus.yml:/etc/prometheus/prometheus.yml"
-    restart: always
+      - "./monitor/prometheus.yml:/etc/prometheus/prometheus.yml:ro"
+      - prometheus_data:/prometheus
+    restart: unless-stopped
     networks:
       - hubeleven-network
 
   grafana:
-    image: grafana/grafana
+    image: grafana/grafana:latest
     container_name: grafana-hubeleven
     ports:
       - "3000:3000"
     depends_on:
       - prometheus
-    restart: always
+    volumes:
+      - grafana_data:/var/lib/grafana
+    restart: unless-stopped
     networks:
       - hubeleven-network
 
   loki:
-    image: grafana/loki
+    image: grafana/loki:latest
     container_name: loki-hubeleven
     ports:
       - "3100:3100"
+    command: -config.file=/etc/loki/loki.yml
     volumes:
-      - "./monitor/loki.yml:/etc/loki/loki.yml"
-    restart: always
+      - "./monitor/loki.yml:/etc/loki/loki.yml:ro"
+      - loki_data:/loki
+    restart: unless-stopped
     networks:
       - hubeleven-network
 
-  # nGrinder Controller
+  # Load Test (nGrinder)
   ngrinder-controller:
-    image: ngrinder/controller
-    container_name: ngrinder-controller
-    restart: always
+    image: ngrinder/controller:latest
+    platform: linux/amd64
+    container_name: ngrinder-controller-hubeleven
     ports:
       - "9000:80"
       - "16001:16001"
       - "12000-12009:12000-12009"
     volumes:
       - ./ngrinder-controller:/opt/ngrinder-controller
+    restart: unless-stopped
     networks:
       - hubeleven-network
 
-  # nGrinder Agent
   ngrinder-agent:
-    image: ngrinder/agent
-    container_name: ngrinder-agent
-    restart: always
+    image: ngrinder/agent:latest
+    platform: linux/amd64
+    container_name: ngrinder-agent-hubeleven
     depends_on:
       - ngrinder-controller
     command: ngrinder-controller:80
+    restart: unless-stopped
     networks:
       - hubeleven-network
 
