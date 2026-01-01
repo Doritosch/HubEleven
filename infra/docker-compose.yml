@@ -1,4 +1,5 @@
 services:
+  # 데이터베이스
   mysql:
     image: mysql:8.4
     container_name: mysql-hubeleven
@@ -15,6 +16,7 @@ services:
     networks:
       - hubeleven-network
 
+#Redis Cache
   redis:
     image: redis:7.2
     container_name: redis-hubeleven
@@ -35,6 +37,7 @@ services:
     networks:
       - hubeleven-network
 
+# Messaging(Kafka+Zookeeper)
   zookeeper:
     image: wurstmeister/zookeeper:latest
     platform: linux/amd64
@@ -79,6 +82,7 @@ services:
     networks:
       - hubeleven-network
 
+#Tracing
   zipkin:
     image: openzipkin/zipkin:latest
     platform: linux/amd64
@@ -89,6 +93,7 @@ services:
     networks:
       - hubeleven-network
 
+#Monitoring (Prometheus / Grafana / Loki)
   prometheus:
     image: prom/prometheus
     container_name: prometheus-hubeleven
@@ -122,9 +127,37 @@ services:
     networks:
       - hubeleven-network
 
+  # nGrinder Controller
+  ngrinder-controller:
+    image: ngrinder/controller
+    container_name: ngrinder-controller
+    restart: always
+    ports:
+      - "9000:80"
+      - "16001:16001"
+      - "12000-12009:12000-12009"
+    volumes:
+      - ./ngrinder-controller:/opt/ngrinder-controller
+    networks:
+      - hubeleven-network
+
+  # nGrinder Agent
+  ngrinder-agent:
+    image: ngrinder/agent
+    container_name: ngrinder-agent
+    restart: always
+    depends_on:
+      - ngrinder-controller
+    command: ngrinder-controller:80
+    networks:
+      - hubeleven-network
+
 volumes:
   mysql_data:
   redis_data:
+  prometheus_data:
+  grafana_data:
+  loki_data:
 
 networks:
   hubeleven-network:
