@@ -32,4 +32,3 @@ public class OpenApiConfig {
 												.description("JWT 토큰을 입력하세요 (Bearer 제외)")));
 	}
 }
-
