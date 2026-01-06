@@ -1,12 +1,12 @@
-package com.hubEleven.company.application.dto;
+package com.hubEleven.company.application.dto.response;
 
 import com.hubEleven.company.domain.model.Company;
-import com.hubEleven.company.domain.model.CompanyStatus;
-import com.hubEleven.company.domain.model.CompanyType;
+import com.hubEleven.company.domain.vo.CompanyStatus;
+import com.hubEleven.company.domain.vo.CompanyType;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public record CompanyDTO(
+public record CompanyResult(
 		UUID companyId,
 		UUID hubId,
 		String name,
@@ -16,8 +16,8 @@ public record CompanyDTO(
 		String address,
 		LocalDateTime createdAt,
 		LocalDateTime updatedAt) {
-	public static CompanyDTO from(Company company) {
-		return new CompanyDTO(
+	public static CompanyResult from(Company company) {
+		return new CompanyResult(
 				company.getCompanyId(),
 				company.getHubId(),
 				company.getName(),
