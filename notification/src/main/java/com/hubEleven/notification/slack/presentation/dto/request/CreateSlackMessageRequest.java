@@ -1,5 +1,7 @@
-package com.hubEleven.notification.slack.application.dto;
+package com.hubEleven.notification.slack.presentation.dto.request;
 
+import com.hubEleven.notification.slack.application.command.CreateSlackMessageCommand;
+import com.hubEleven.notification.slack.application.command.CreateSlackMessageItemCommand;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -8,7 +10,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-public record SlackMessageCreateRequest(
+public record CreateSlackMessageRequest(
 		@NotNull(message = "주문 ID는 필수 입력 항목입니다.") UUID orderId,
 		@NotBlank(message = "수신자 ID는 필수 입력 항목입니다.") @Size(max = 100, message = "수신자 ID는 100자 이하여야 합니다.")
 				String recipientId,
@@ -24,7 +26,30 @@ public record SlackMessageCreateRequest(
 		String requestNote,
 		@NotBlank(message = "배송 담당자 이름은 필수 입력 항목입니다.") String deliveryManagerName,
 		@NotBlank(message = "배송 담당자 이메일은 필수 입력 항목입니다.") @Email String deliveryManagerEmail,
-		List<Item> items,
-		LocalDateTime createdAt) {
-	public record Item(String name, int quantity, String note) {}
+		List<CreateSlackMessageItemRequest> items) {
+	public CreateSlackMessageCommand toCommand() {
+		List<CreateSlackMessageItemCommand> mappedItems =
+				(items == null)
+						? null
+						: items.stream()
+								.map(i -> new CreateSlackMessageItemCommand(i.name(), i.quantity(), i.note()))
+								.toList();
+
+		return new CreateSlackMessageCommand(
+				orderId,
+				recipientId,
+				channel,
+				customerName,
+				customerEmail,
+				orderDateTime,
+				requestedArrivalDateTime,
+				sourceHub,
+				viaHubs,
+				destinationHub,
+				destinationAddress,
+				requestNote,
+				deliveryManagerName,
+				deliveryManagerEmail,
+				mappedItems);
+	}
 }
