@@ -34,10 +34,10 @@ public class DeliveryManagerFeignClientTest {
 		assertNotNull(response.getBody(), "응답 body가 null이 아니어야 합니다");
 		assertTrue(response.getStatusCode().is2xxSuccessful(), "HTTP 상태 코드가 2xx여야 합니다");
 
-		ApiResponse<UserInfoResponse> apiResponse = response.getBody();
-		assertNotNull(apiResponse.result(), "result가 null이 아니어야 합니다");
+		UserInfoResponse apiResponse = response.getBody().data();
+		assertNotNull(apiResponse, "result가 null이 아니어야 합니다");
 
-		UserInfoResponse userDto = apiResponse.result();
+		UserInfoResponse userDto = apiResponse;
 		assertThat(userDto.userId()).isEqualTo(userId);
 
 		// 로그 출력

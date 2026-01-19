@@ -1,13 +1,13 @@
 package com.hubEleven.user.domain.exception;
 
-import com.commonLib.common.code.StatusCode;
+import com.commonLib.common.code.ErrorCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 @Getter
 @RequiredArgsConstructor
-public enum ErrorCode implements StatusCode {
+public enum UserErrorCode implements ErrorCode {
 	INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호는 8~15자이며, 대소문자/숫자/특수문자를 포함해야 합니다."),
 	INVALID_USERNAME(HttpStatus.BAD_REQUEST, "아이디는 4~10자이며, 소문자/숫자로 구성되어야 합니다."),
 	DUPLICATED_USERNAME(HttpStatus.BAD_REQUEST, "이미 사용하고 있는 아이디입니다."),
@@ -28,10 +28,5 @@ public enum ErrorCode implements StatusCode {
 	@Override
 	public String getMessage() {
 		return description;
-	}
-
-	@Override
-	public String getName() {
-		return this.name();
 	}
 }

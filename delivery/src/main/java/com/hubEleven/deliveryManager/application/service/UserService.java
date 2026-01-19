@@ -28,7 +28,7 @@ public class UserService {
 				log.warn("유저 조회 실패: 응답이 비어 있음 (id: {})", id);
 				throw new GlobalException(DeliveryManagerErrorCode.USER_NOT_FOUND);
 			}
-			return response.getBody().result();
+			return response.getBody().data();
 		} catch (Exception e) {
 			log.error("유저 조회 중 예외 발생 (id: {}): {}", id, e.getMessage());
 			throw new GlobalException(DeliveryManagerErrorCode.USER_NOT_FOUND);

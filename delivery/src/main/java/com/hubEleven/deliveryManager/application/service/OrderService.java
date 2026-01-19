@@ -27,6 +27,6 @@ public class OrderService {
 			throw new GlobalException(DeliveryManagerErrorCode.ORDER_NOT_FOUND);
 		}
 		log.info("order 정보 받아옴");
-		return response.getBody().result();
+		return response.getBody().data();
 	}
 }

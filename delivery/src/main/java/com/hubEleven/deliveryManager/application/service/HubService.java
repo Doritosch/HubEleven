@@ -28,7 +28,7 @@ public class HubService {
 				throw new GlobalException(DeliveryManagerErrorCode.HUB_NOT_FOUND);
 			}
 
-			return response.getBody().result();
+			return response.getBody().data();
 
 		} catch (Exception e) {
 			// 로깅, 예외 변환 등

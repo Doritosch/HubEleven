@@ -5,7 +5,7 @@ import com.hubEleven.user.domain.vo.Role;
 import com.hubEleven.user.domain.vo.SignStatus;
 import java.util.UUID;
 
-public record UserInfo(
+public record UserInfoResult(
 		Long userId,
 		String username,
 		String password,
@@ -15,8 +15,8 @@ public record UserInfo(
 		Role role,
 		SignStatus status,
 		UUID companyId) {
-	public static UserInfo from(User user) {
-		return new UserInfo(
+	public static UserInfoResult from(User user) {
+		return new UserInfoResult(
 				user.getId(),
 				user.getUsername(),
 				user.getPassword(),

@@ -2,7 +2,6 @@ package com.hubEleven.product.presentation.controller;
 
 import com.commonLib.common.request.CommonPageRequest;
 import com.commonLib.common.response.ApiResponse;
-import com.commonLib.common.response.ApiResponseEntity;
 import com.commonLib.common.response.CommonPageResponse;
 import com.commonLib.common.utils.PagingUtils;
 import com.hubEleven.product.application.dto.ProductResult;
@@ -15,6 +14,7 @@ import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,7 +41,8 @@ public class ProductController {
 
 		ProductResult result = productService.create(request);
 
-		return ApiResponseEntity.success(ProductResponse.from(result));
+		return ResponseEntity.status(HttpStatus.OK)
+				.body(ApiResponse.success(ProductResponse.from(result)));
 	}
 
 	@Operation(summary = "상품 전체  조회 API", description = "상품 전체 목록을 조회한다.")
@@ -59,7 +60,7 @@ public class ProductController {
 		CommonPageResponse<ProductResponse> response =
 				PagingUtils.convert(products, ProductResponse::from);
 
-		return ApiResponseEntity.success(response);
+		return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(response));
 	}
 
 	@Operation(summary = "상품 단건 조회 API", description = "상품 ID로 상품을 조회한다.")
@@ -69,7 +70,8 @@ public class ProductController {
 
 		ProductResult result = productService.getProduct(productId);
 
-		return ApiResponseEntity.success(ProductResponse.from(result));
+		return ResponseEntity.status(HttpStatus.OK)
+				.body(ApiResponse.success(ProductResponse.from(result)));
 	}
 
 	@Operation(summary = "상품 수정 API", description = "상품 정보를 수정한다.")
@@ -79,7 +81,8 @@ public class ProductController {
 
 		ProductResult result = productService.updateProduct(productId, request);
 
-		return ApiResponseEntity.success(ProductResponse.from(result));
+		return ResponseEntity.status(HttpStatus.OK)
+				.body(ApiResponse.success(ProductResponse.from(result)));
 	}
 
 	@Operation(summary = "상품 삭제 API", description = "상품을 삭제한다.")
@@ -89,7 +92,7 @@ public class ProductController {
 
 		productService.deleteProduct(productId, userId);
 
-		return ApiResponseEntity.success(null);
+		return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(null));
 	}
 
 	@Operation(summary = "상품 검색 API", description = "키워드 기반으로 상품을 검색한다.")
@@ -103,6 +106,6 @@ public class ProductController {
 		CommonPageResponse<ProductResponse> response =
 				PagingUtils.convert(products, ProductResponse::from);
 
-		return ApiResponseEntity.success(response);
+		return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(response));
 	}
 }
