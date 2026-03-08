@@ -1,7 +1,7 @@
 package com.hubEleven.user.infrastructure.config;
 
 import com.hubEleven.user.infrastructure.security.jwt.CustomJwtAuthenticationConverter;
-import com.hubEleven.user.infrastructure.security.jwt.TokenProvider;
+import com.hubEleven.user.infrastructure.security.jwt.AccessTokenProvider;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import java.nio.charset.StandardCharsets;
 import javax.crypto.spec.SecretKeySpec;
@@ -33,8 +33,8 @@ public class JwtConfig {
 		return NimbusJwtDecoder.withSecretKey(key).build();
 	}
 
-	TokenProvider tokenProvider() throws Exception {
-		return new TokenProvider(jwtEncoder());
+	AccessTokenProvider tokenProvider() throws Exception {
+		return new AccessTokenProvider(jwtEncoder());
 	}
 
 	@Bean

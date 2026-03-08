@@ -9,6 +9,7 @@ import com.hubEleven.user.application.command.LoginCommand;
 import com.hubEleven.user.application.command.UserCreateCommand;
 import com.hubEleven.user.application.command.UserStatusUpdateCommand;
 import com.hubEleven.user.application.command.UserUpdateCommand;
+import com.hubEleven.user.application.dto.TokenResult;
 import com.hubEleven.user.application.dto.UserCreateResult;
 import com.hubEleven.user.application.dto.UserInfoResult;
 import com.hubEleven.user.infrastructure.security.CustomUserDetails;
@@ -18,11 +19,13 @@ import com.hubEleven.user.presentation.dto.request.UserStatusUpdateRequest;
 import com.hubEleven.user.presentation.dto.request.UserUpdateRequest;
 import com.hubEleven.user.presentation.dto.response.LoginResponse;
 import com.hubEleven.user.presentation.dto.response.SignupResponse;
+import com.hubEleven.user.presentation.dto.response.TokenResponse;
 import com.hubEleven.user.presentation.dto.response.UserInfoResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -35,6 +38,7 @@ public class UserController {
 
 	private final UserService userService;
 	private final AuthService authService;
+	private final static Long maxAge = 604800L;
 
 	@PostMapping("/signup")
 	public ResponseEntity<ApiResponse<SignupResponse>> signup(
@@ -67,12 +71,19 @@ public class UserController {
 			@Valid @RequestBody LoginRequest request) {
 		LoginCommand command = new LoginCommand(request.username(), request.password());
 
-		String token = authService.login(command);
-		LoginResponse response = new LoginResponse(token);
+		TokenResponse tokenResponse = TokenResponse.from(authService.login(command));
+
+		ResponseCookie refreshToken = ResponseCookie.from("refreshToken", tokenResponse.refreshToken())
+				.httpOnly(true)
+				.secure(true)
+				.path("/")
+				.maxAge(maxAge)
+				.build();
 
 		return ResponseEntity.status(HttpStatus.OK)
-				.header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
-				.body(ApiResponse.success(response));
+				.header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenResponse.accessToken())
+				.header(HttpHeaders.SET_COOKIE, refreshToken.toString())
+				.body(ApiResponse.success(tokenResponse.accessToken()));
 	}
 
 	@GetMapping
@@ -141,6 +152,12 @@ public class UserController {
 		userService.deleteUser(id, userDetails.getUserId());
 
 		return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(null));
+	}
+
+	@PostMapping("/refresh")
+	public TokenResponse refresh(@CookieValue("refreshToken") String refreshToken) {
+		TokenResult token = authService.refresh(refreshToken);
+		return TokenResponse.from(token);
 	}
 
 	private CommonPageResponse<UserInfoResponse> toUserInfoResponsePage(

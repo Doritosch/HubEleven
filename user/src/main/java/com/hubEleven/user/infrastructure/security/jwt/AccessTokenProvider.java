@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class TokenProvider implements JwtProvider {
+public class AccessTokenProvider implements JwtProvider {
 
 	private final JwtEncoder jwtEncoder;
 
