@@ -1,4 +1,4 @@
-package com.hubEleven.user.domain.token;
+package com.hubEleven.user.infrastructure.token;
 
 import lombok.Getter;
 import org.springframework.data.annotation.Id;
