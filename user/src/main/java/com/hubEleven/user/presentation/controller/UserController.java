@@ -17,7 +17,6 @@ import com.hubEleven.user.presentation.dto.request.LoginRequest;
 import com.hubEleven.user.presentation.dto.request.SignupRequest;
 import com.hubEleven.user.presentation.dto.request.UserStatusUpdateRequest;
 import com.hubEleven.user.presentation.dto.request.UserUpdateRequest;
-import com.hubEleven.user.presentation.dto.response.LoginResponse;
 import com.hubEleven.user.presentation.dto.response.SignupResponse;
 import com.hubEleven.user.presentation.dto.response.TokenResponse;
 import com.hubEleven.user.presentation.dto.response.UserInfoResponse;
@@ -38,7 +37,7 @@ public class UserController {
 
 	private final UserService userService;
 	private final AuthService authService;
-	private final static Long maxAge = 604800L;
+	private static final Long maxAge = 604800L;
 
 	@PostMapping("/signup")
 	public ResponseEntity<ApiResponse<SignupResponse>> signup(
@@ -67,18 +66,19 @@ public class UserController {
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<ApiResponse<LoginResponse>> login(
+	public ResponseEntity<ApiResponse<TokenResponse>> login(
 			@Valid @RequestBody LoginRequest request) {
 		LoginCommand command = new LoginCommand(request.username(), request.password());
 
 		TokenResponse tokenResponse = TokenResponse.from(authService.login(command));
 
-		ResponseCookie refreshToken = ResponseCookie.from("refreshToken", tokenResponse.refreshToken())
-				.httpOnly(true)
-				.secure(true)
-				.path("/")
-				.maxAge(maxAge)
-				.build();
+		ResponseCookie refreshToken =
+				ResponseCookie.from("refreshToken", tokenResponse.refreshToken())
+						.httpOnly(true)
+						.secure(true)
+						.path("/")
+						.maxAge(maxAge)
+						.build();
 
 		return ResponseEntity.status(HttpStatus.OK)
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenResponse.accessToken())

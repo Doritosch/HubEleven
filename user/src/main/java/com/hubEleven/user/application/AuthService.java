@@ -9,19 +9,18 @@ import com.hubEleven.user.application.dto.TokenResult;
 import com.hubEleven.user.domain.exception.UserErrorCode;
 import com.hubEleven.user.domain.model.User;
 import com.hubEleven.user.domain.repository.UserRepository;
-import com.hubEleven.user.infrastructure.token.RefreshToken;
-import com.hubEleven.user.infrastructure.token.RefreshTokenRepository;
 import com.hubEleven.user.domain.vo.SignStatus;
 import com.hubEleven.user.infrastructure.security.CustomUserDetails;
 import com.hubEleven.user.infrastructure.security.jwt.JwtProvider;
+import com.hubEleven.user.infrastructure.token.RefreshToken;
+import com.hubEleven.user.infrastructure.token.RefreshTokenRepository;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
-
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -57,13 +56,15 @@ public class AuthService {
 	}
 
 	public TokenResult refresh(String refreshToken) {
-		RefreshToken token = refreshTokenRepository.findById(refreshToken)
-				.orElseThrow(() ->
-					new GlobalException(UserErrorCode.INVALID_REFRESH_TOKEN)
-				);
+		RefreshToken token =
+				refreshTokenRepository
+						.findById(refreshToken)
+						.orElseThrow(() -> new GlobalException(UserErrorCode.INVALID_REFRESH_TOKEN));
 
-		User user = userRepository.findByIdAndNotDeleted(token.getUserId())
-				.orElseThrow(() -> new GlobalException(UserErrorCode.NOT_FOUND_USER));
+		User user =
+				userRepository
+						.findByIdAndNotDeleted(token.getUserId())
+						.orElseThrow(() -> new GlobalException(UserErrorCode.NOT_FOUND_USER));
 
 		CustomUserDetails customUserDetails = new CustomUserDetails(user);
 
